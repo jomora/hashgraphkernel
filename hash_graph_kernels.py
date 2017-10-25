@@ -8,11 +8,13 @@ from graphkernel import hash_graph_kernel as rbk
 from graphkernel import shortest_path_kernel_explicit as sp_exp
 from graphkernel import wl_kernel as wl
 
+ALGORITHMS = "ALGORITHMS"
+ENZYMES = "ENZYMES"
 
 def main():
     # Load ENZYMES data set
-    graph_db, classes = dp.read_txt("ENZYMES")
-
+    # graph_db, classes = dp.read_txt("ENZYMES")
+    graph_db = dp.read_graph_db(ENZYMES)
     # Parameters used: 
     # Compute gram matrix: False, 
     # Normalize gram matrix: False
@@ -20,10 +22,10 @@ def main():
     kernel_parameters_sp = [False, False, 0]
 
     # Parameters used: 
+    # Number of iterations for WL: 3
     # Compute gram matrix: False, 
     # Normalize gram matrix: False
     # Use discrete labels: False
-    # Number of iterations for WL: 3
     kernel_parameters_wl = [3, False, False, 0]
 
     # Use discrete labels, too
@@ -47,7 +49,8 @@ def main():
     gram_matrix = aux.normalize_gram_matrix(gram_matrix)
 
     # Write out LIBSVM matrix
-    dp.write_lib_svm(gram_matrix, classes, "gram_matrix")
+    # dp.write_lib_svm(gram_matrix, classes, "gram_matrix")
+    dp.write_gram_matrix(gram_matrix,"gram_matrix_simple")
 
 
 if __name__ == "__main__":

@@ -6,8 +6,10 @@ import graph_tool as gt
 import numpy as np
 import os.path as path
 
-
 def read_txt(ds_name):
+    return read_graph_db(ds_name),read_classes(ds_name)
+
+def read_graph_db(ds_name):
     pre = ""
 
     with open("datasets/" + pre + ds_name + "/" + ds_name + "_graph_indicator.txt", "r") as f:
@@ -120,12 +122,17 @@ def read_txt(ds_name):
             l_ea[g_id][edge_list[i]] = l
             g.ep.ea = l_ea[g_id]
 
+    return graph_db
+
+def read_classes(ds_name):
+    pre = ""
     # Classes
     with open("datasets/" + pre + ds_name + "/" + ds_name + "_graph_labels.txt", "r") as f:
         classes = [int(i) for i in list(f)]
     f.closed
 
-    return graph_db, classes
+    return classes
+
 
 
 def write_lib_svm(gram_matrix, classes, name):
@@ -139,4 +146,14 @@ def write_lib_svm(gram_matrix, classes, name):
             s += "\n"
             f.write(s)
             k += 1
+    f.closed
+
+def write_gram_matrix(gram_matrix,name):
+    with open(name, 'w') as f:
+        s = ""
+        for row in gram_matrix:
+            for r in row:
+                s += str(r) + " " 
+            s += "\n"
+            f.write(s)
     f.closed
