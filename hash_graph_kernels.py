@@ -7,14 +7,18 @@ from auxiliarymethods import dataset_parsers as dp
 from graphkernel import hash_graph_kernel as rbk
 from graphkernel import shortest_path_kernel_explicit as sp_exp
 from graphkernel import wl_kernel as wl
+import numpy as np
 
 ALGORITHMS = "ALGORITHMS"
 ENZYMES = "ENZYMES"
+spring_context="spring-context-indexer-5.0.1.RELEASE"
 
 def main():
+    dataset = spring_context
     # Load ENZYMES data set
-    # graph_db, classes = dp.read_txt("ENZYMES")
-    graph_db = dp.read_graph_db(ENZYMES)
+    #graph_db, classes = dp.read_txt(ALGORITHMS)
+    graph_db = dp.read_graph_db(dataset)
+    
     # Parameters used: 
     # Compute gram matrix: False, 
     # Normalize gram matrix: False
@@ -49,8 +53,11 @@ def main():
     gram_matrix = aux.normalize_gram_matrix(gram_matrix)
 
     # Write out LIBSVM matrix
-    # dp.write_lib_svm(gram_matrix, classes, "gram_matrix")
-    dp.write_gram_matrix(gram_matrix,"gram_matrix_simple")
+    #dp.write_lib_svm(gram_matrix, classes, "gram_matrix")
+
+    # Write out simple Gram matrix used for clustering
+    dp.write_gram_matrix(gram_matrix,dataset)
+    print("Shape of Gram Matrix: " + str(np.shape(gram_matrix)))
 
 
 if __name__ == "__main__":

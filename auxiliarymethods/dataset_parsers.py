@@ -5,14 +5,16 @@
 import graph_tool as gt
 import numpy as np
 import os.path as path
+import os 
 
+PATH = os.environ['SEML_DATA'] + '/output/spring_projects/io.springframework/'
 def read_txt(ds_name):
     return read_graph_db(ds_name),read_classes(ds_name)
 
 def read_graph_db(ds_name):
     pre = ""
 
-    with open("datasets/" + pre + ds_name + "/" + ds_name + "_graph_indicator.txt", "r") as f:
+    with open(PATH + pre + ds_name + "/" + ds_name + "_graph_indicator.txt", "r") as f:
         graph_indicator = [int(i) - 1 for i in list(f)]
     f.closed
 
@@ -40,7 +42,7 @@ def read_graph_db(ds_name):
         vertex_list.append(vertex_list_g)
 
     # Edges
-    with open("datasets/" + pre + ds_name + "/" + ds_name + "_A.txt", "r") as f:
+    with open(PATH + pre + ds_name + "/" + ds_name + "_A.txt", "r") as f:
         edges = [i.split(',') for i in list(f)]
     f.closed
 
@@ -59,8 +61,8 @@ def read_graph_db(ds_name):
             edge_list.append(g.add_edge(e[0] - off, e[1] - off))
 
     # Node labels
-    if path.exists("datasets/" + pre + ds_name + "/" + ds_name + "_node_labels.txt"):
-        with open("datasets/" + pre + ds_name + "/" + ds_name + "_node_labels.txt", "r") as f:
+    if path.exists(PATH + pre + ds_name + "/" + ds_name + "_node_labels.txt"):
+        with open(PATH + pre + ds_name + "/" + ds_name + "_node_labels.txt", "r") as f:
             node_labels = [int(i) for i in list(f)]
         f.closed
 
@@ -73,8 +75,8 @@ def read_graph_db(ds_name):
 
 
     # Node Attributes
-    if path.exists("datasets/" + pre + ds_name + "/" + ds_name + "_node_attributes.txt"):
-        with open("datasets/" + pre + ds_name + "/" + ds_name + "_node_attributes.txt", "r") as f:
+    if path.exists(PATH + pre + ds_name + "/" + ds_name + "_node_attributes.txt"):
+        with open(PATH + pre + ds_name + "/" + ds_name + "_node_attributes.txt", "r") as f:
             node_attributes = [map(float, i.split(',')) for i in list(f)]
         f.closed
 
@@ -87,8 +89,8 @@ def read_graph_db(ds_name):
 
 
     # Edge Labels
-    if path.exists("datasets/" + ds_name + "/" + ds_name + "_edge_labels.txt"):
-        with open("datasets/" + ds_name + "/" + ds_name + "_edge_labels.txt", "r") as f:
+    if path.exists(PATH + ds_name + "/" + ds_name + "_edge_labels.txt"):
+        with open(PATH + ds_name + "/" + ds_name + "_edge_labels.txt", "r") as f:
             edge_labels = [int(i) for i in list(f)]
         f.closed
 
@@ -105,8 +107,8 @@ def read_graph_db(ds_name):
             g.ep.el = l_el[g_id]
 
     # Edge Attributes
-    if path.exists("datasets/" + ds_name + "/" + ds_name + "_edge_attributes.txt"):
-        with open("datasets/" + ds_name + "/" + ds_name + "_edge_attributes.txt", "r") as f:
+    if path.exists(PATH + ds_name + "/" + ds_name + "_edge_attributes.txt"):
+        with open(PATH + ds_name + "/" + ds_name + "_edge_attributes.txt", "r") as f:
             edge_attributes = [map(float, i.split(',')) for i in list(f)]
         f.closed
 
@@ -127,7 +129,7 @@ def read_graph_db(ds_name):
 def read_classes(ds_name):
     pre = ""
     # Classes
-    with open("datasets/" + pre + ds_name + "/" + ds_name + "_graph_labels.txt", "r") as f:
+    with open(PATH + pre + ds_name + "/" + ds_name + "_graph_labels.txt", "r") as f:
         classes = [int(i) for i in list(f)]
     f.closed
 
@@ -148,10 +150,10 @@ def write_lib_svm(gram_matrix, classes, name):
             k += 1
     f.closed
 
-def write_gram_matrix(gram_matrix,name):
-    with open(name, 'w') as f:
-        s = ""
+def write_gram_matrix(gram_matrix,ds_name):
+    with open(PATH + ds_name + "/"+ds_name+"_gram_matrix_simple", 'w') as f:
         for row in gram_matrix:
+            s = ""
             for r in row:
                 s += str(r) + " " 
             s += "\n"
