@@ -7,7 +7,7 @@ import numpy as np
 import os.path as path
 import os 
 
-PATH = os.environ['SEML_DATA'] + '/output/spring_projects/io.springframework/'
+PATH = os.environ['SEML_DATA'] + '/output/'
 def read_txt(ds_name):
     return read_graph_db(ds_name),read_classes(ds_name)
 
@@ -158,4 +158,9 @@ def write_gram_matrix(gram_matrix,ds_name):
                 s += str(r) + " " 
             s += "\n"
             f.write(s)
+    f.closed
+
+def write_feature_vectors(feature_vectors,ds_name):
+    with open(PATH + ds_name + "/"+ds_name+"_feature_vectors", 'w') as f:
+        f.write(str(feature_vectors))
     f.closed

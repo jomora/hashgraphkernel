@@ -8,6 +8,7 @@ import scipy.sparse as sparse
 from sklearn import preprocessing as pre
 
 from auxiliarymethods import auxiliary_methods as aux
+from setuptools.dist import Feature
 
 
 def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, iterations=20, lsh_bin_width=1.0, sigma=1.0,
@@ -67,4 +68,4 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, iterations=20, l
     if normalize_gram_matrix:
         gram_matrix = aux.normalize_gram_matrix(gram_matrix)
 
-    return gram_matrix
+    return gram_matrix,feature_vectors
