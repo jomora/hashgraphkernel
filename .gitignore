@@ -2,3 +2,4 @@
 .project
 .pydevproject
 *.txt
+gram_*
