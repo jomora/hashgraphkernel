@@ -9,7 +9,7 @@ import os
 
 PATH = os.environ['SEML_DATA'] + '/output/'
 def read_txt(ds_name):
-    return read_graph_db(ds_name),read_classes(ds_name)
+    return read_graph_db(ds_name), read_classes(ds_name)
 
 def read_graph_db(ds_name):
     pre = ""
@@ -150,8 +150,8 @@ def write_lib_svm(gram_matrix, classes, name):
             k += 1
     f.closed
 
-def write_gram_matrix(gram_matrix,ds_name):
-    with open(PATH + ds_name + "/"+ds_name+"_gram_matrix_simple", 'w') as f:
+def write_gram_matrix(gram_matrix, ds_name):
+    with open(PATH + ds_name + "/" + ds_name + "_gram_matrix_simple", 'w') as f:
         for row in gram_matrix:
             s = ""
             for r in row:
@@ -160,7 +160,17 @@ def write_gram_matrix(gram_matrix,ds_name):
             f.write(s)
     f.closed
 
-def write_feature_vectors(feature_vectors,ds_name):
-    with open(PATH + ds_name + "/"+ds_name+"_feature_vectors", 'w') as f:
-        f.write(str(feature_vectors))
+def write_feature_vectors(feature_vectors, ds_name, classes=[]):
+    
+    with open(PATH + ds_name + "/" + ds_name + "_feature_vectors", 'w') as f:
+        dense = feature_vectors.todense()
+        shape = dense.shape
+        for i in range(shape[0]):
+            s = "" if classes == [] else str(classes[i]) + " "
+            for j in range(shape[1]):
+                s += str(dense[i, j])
+                s += " "
+                  
+            f.write(s + "\n")
+#         f.write(feature_vectors.todense())
     f.closed
