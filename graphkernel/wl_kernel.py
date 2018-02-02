@@ -21,7 +21,7 @@ def weisfeiler_lehman_subtree_kernel(graph_db, hashed_attributes, *kwargs):
     # Create one empty feature vector for each graph
     feature_vectors = []
     for _ in graph_db:
-        feature_vectors.append(np.zeros(0, dtype=np.float64))
+        feature_vectors.append(lil.lil_matrix((0,0),dtype=np.float64).tocsc())#np.zeros(0, dtype=np.float64))
 
     # Construct block diagonal matrix of all adjacency matrices
     adjacency_matrices = []
@@ -77,17 +77,25 @@ def weisfeiler_lehman_subtree_kernel(graph_db, hashed_attributes, *kwargs):
                 colors_1 = compute_coloring(M, colors_1, log_primes[0:len(colors_1)])
         else:
             max_1 = int(np.amax(colors_1) + 1)
-
+            print(feature_vectors[0])
+            
+            print(feature_vectors[0].shape)
             feature_vectors = [
-                np.concatenate((feature_vectors[i], np.bincount(colors_1[index[0]:index[1] + 1], minlength=max_1))) for
+                # np.concatenate((feature_vectors[i], np.bincount(colors_1[index[0]:index[1] + 1], minlength=max_1))) for
+                # i, index in enumerate(graph_indices)]
+                sp.sparse.hstack((feature_vectors[i], np.bincount(colors_1[index[0]:index[1] + 1], minlength=max_1))) for
                 i, index in enumerate(graph_indices)]
-
+            print(feature_vectors[0])
+            print(feature_vectors[0].shape)
+            print()
+            # if it == 2:
+            #     exit(0)
             # Avoid coloring computation in last iteration
             if it < iterations:
                 colors_1 = compute_coloring(M, colors_1, log_primes[0:len(colors_1)])
 
     if not compute_gram_matrix:
-        return lil.lil_matrix(feature_vectors, dtype=np.float64)
+        return sp.sparse.vstack(feature_vectors) #lil.lil_matrix(feature_vectors)
     else:
         # Make feature vectors sparse
         gram_matrix = csr.csr_matrix(feature_vectors, dtype=np.float64)

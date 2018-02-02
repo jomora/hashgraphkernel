@@ -92,7 +92,7 @@ xstream
 def main():
     start = time.time()
     print ("# Program started at " + format_time(start))
-    dataset = "all" 
+    dataset = "ENZYMES" 
     print "# Processing dataset: " + dataset
     # Load ENZYMES data set
     graph_db, classes = dp.read_txt(dataset)
@@ -123,6 +123,10 @@ def main():
 #                                         scale_attributes=True, lsh_bin_width=1.0, sigma=1.0, use_gram_matrices=True)
 #     # Normalize gram matrix
 #     gram_matrix = aux.normalize_gram_matrix(gram_matrix)
+#    gram_matrix = rbk.hash_graph_kernel(graph_db, sp_exp.shortest_path_kernel, kernel_parameters_sp, 20,
+ #                                       scale_attributes=True, lsh_bin_width=1.0, sigma=1.0)
+    # Normalize gram matrix
+  #  gram_matrix = aux.normalize_gram_matrix(gram_matrix)
 
     # Compute gram matrix for HGK-SP
     # 20 is the number of iterations
