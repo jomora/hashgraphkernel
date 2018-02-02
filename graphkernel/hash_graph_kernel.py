@@ -42,7 +42,7 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, iterations=20, l
         colors_hashed = aux.locally_sensitive_hashing(colors_0, dim_attributes, lsh_bin_width, sigma=sigma)
 
         tmp = base_kernel(graph_db, colors_hashed, *kernel_parameters)
-
+        print(type(tmp))
         if it == 0 and not use_gram_matrices:
             feature_vectors = tmp
         else:
@@ -53,6 +53,8 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, iterations=20, l
                 gram_matrix += feature_vectors.dot(feature_vectors.T).toarray()
 
             else:
+                print(type(tmp))
+                print(type(feature_vectors))
                 feature_vectors = sparse.hstack((feature_vectors, tmp))
 
     feature_vectors = feature_vectors.tocsr()
