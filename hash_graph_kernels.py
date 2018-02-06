@@ -92,7 +92,8 @@ xstream
 def main():
     start = time.time()
     print ("# Program started at " + format_time(start))
-    dataset = "all" 
+    dataset = "all"
+    dataset = "ENZYMES"
     print ("# Processing dataset: " + dataset)
     # Load ENZYMES data set
     graph_db, classes = dp.read_txt(dataset)
@@ -140,13 +141,19 @@ def main():
     print ("Shape of feature vectors: " + str(feature_vectors.todense().shape))
 
     # Write out LIBSVM matrix
-    dp.write_lib_svm(gram_matrix, classes, "gram_matrix")
+    #dp.write_lib_svm(gram_matrix, classes, "gram_matrix")
 
     # Write out simple Gram matrix used for clustering
-    dp.write_gram_matrix(gram_matrix, dataset)
+    # dp.write_gram_matrix(gram_matrix, dataset)
+    # Write out simple Gram matrix in sparse format
+    
+    print("Gram matrix in NPZ format")
+    import scipy.sparse as sps
+    #gram_matrix = sps.lil_matrix(gram_matrix).tocoo()
+    sps.save_npz('sparse_gram.npz',gram_matrix.tocoo())
     print("Shape of Gram Matrix: " + str(np.shape(gram_matrix)))
 
-    dp.write_feature_vectors(feature_vectors, dataset, [])
+    #dp.write_feature_vectors(feature_vectors, dataset, [])
     end = time.time()
     print ("# Program ended at ") + format_time(start)
     print ("# Duration in [s]: ") + str(end - start)
