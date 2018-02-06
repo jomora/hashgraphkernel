@@ -3,3 +3,5 @@
 .pydevproject
 *.txt
 gram_*
+*.npz
+*.swp
