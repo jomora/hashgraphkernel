@@ -24,7 +24,7 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, iterations=20, l
     colors_0 = np.zeros([num_vertices, dim_attributes])
     offset = 0
 
-    gram_matrix = np.zeros([n, n])
+    gram_matrix = sparse.lil_matrix((n,n),dtype=np.float64).tocsr() #np.zeros([n, n])
 
     # Get attributes from all graph instances
     graph_indices = []
@@ -43,7 +43,6 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, iterations=20, l
         colors_hashed = aux.locally_sensitive_hashing(colors_0, dim_attributes, lsh_bin_width, sigma=sigma)
 
         tmp = base_kernel(graph_db, colors_hashed, *kernel_parameters)
-        print(type(tmp))
         if it == 0 and not use_gram_matrices:
             feature_vectors = tmp
         else:
@@ -54,8 +53,6 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, iterations=20, l
                 gram_matrix += feature_vectors.dot(feature_vectors.T).toarray()
 
             else:
-                print(type(tmp))
-                print(type(feature_vectors))
                 feature_vectors = sparse.hstack((feature_vectors, tmp))
 
     feature_vectors = feature_vectors.tocsr()
@@ -65,7 +62,7 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, iterations=20, l
         feature_vectors = m.sqrt(1.0 / iterations) * (feature_vectors)
         # Compute Gram matrix
         gram_matrix = feature_vectors.dot(feature_vectors.T)
-        gram_matrix = gram_matrix.toarray()
+        #gram_matrix = gram_matrix.toarray()
 
     if normalize_gram_matrix:
         gram_matrix = aux.normalize_gram_matrix(gram_matrix)

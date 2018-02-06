@@ -77,19 +77,11 @@ def weisfeiler_lehman_subtree_kernel(graph_db, hashed_attributes, *kwargs):
                 colors_1 = compute_coloring(M, colors_1, log_primes[0:len(colors_1)])
         else:
             max_1 = int(np.amax(colors_1) + 1)
-            print(feature_vectors[0])
-            
-            print(feature_vectors[0].shape)
             feature_vectors = [
                 # np.concatenate((feature_vectors[i], np.bincount(colors_1[index[0]:index[1] + 1], minlength=max_1))) for
                 # i, index in enumerate(graph_indices)]
                 sp.sparse.hstack((feature_vectors[i], np.bincount(colors_1[index[0]:index[1] + 1], minlength=max_1))) for
                 i, index in enumerate(graph_indices)]
-            print(feature_vectors[0])
-            print(feature_vectors[0].shape)
-            print()
-            # if it == 2:
-            #     exit(0)
             # Avoid coloring computation in last iteration
             if it < iterations:
                 colors_1 = compute_coloring(M, colors_1, log_primes[0:len(colors_1)])
@@ -102,8 +94,7 @@ def weisfeiler_lehman_subtree_kernel(graph_db, hashed_attributes, *kwargs):
         # Compute gram matrix
         gram_matrix = gram_matrix.dot(gram_matrix.T)
 
-        gram_matrix = gram_matrix.toarray()
-
+        #gram_matrix = gram_matrix.toarray()
         if normalize_gram_matrix:
             return aux.normalize_gram_matrix(gram_matrix)
         else:
