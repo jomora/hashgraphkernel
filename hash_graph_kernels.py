@@ -92,12 +92,12 @@ xstream
 def main():
     start = time.time()
     print ("# Program started at " + format_time(start))
-    dataset = "all"
-    #dataset = "ENZYMES"
+    #dataset = "all"
+    dataset = "ENZYMES"
     print ("# Processing dataset: " + dataset)
     # Load ENZYMES data set
-    graph_db, classes = dp.read_txt(dataset)
-    
+    graph_db, classes = time_it(dp.read_txt,(dataset))
+
 #     graph_db = dp.read_graph_db(dataset)
     
     # Parameters used: 
@@ -131,8 +131,7 @@ def main():
 
     # Compute gram matrix for HGK-SP
     # 20 is the number of iterations
-    gram_matrix, feature_vectors = rbk.hash_graph_kernel(graph_db, wl.weisfeiler_lehman_subtree_kernel, kernel_parameters_wl, 10,
-                                        scale_attributes=True, lsh_bin_width=1.0, sigma=1.0, use_gram_matrices=True)
+    gram_matrix, feature_vectors = time_it(rbk.hash_graph_kernel,graph_db, wl.weisfeiler_lehman_subtree_kernel, kernel_parameters_wl, 10, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0, use_gram_matrices=True)
  
     # Normalize gram matrix
     gram_matrix = aux.normalize_gram_matrix(gram_matrix)
@@ -144,13 +143,12 @@ def main():
     #dp.write_lib_svm(gram_matrix, classes, "gram_matrix")
 
     # Write out simple Gram matrix used for clustering
-    # dp.write_gram_matrix(gram_matrix, dataset)
+    time_it(dp.write_gram_matrix,gram_matrix, dataset)
     # Write out simple Gram matrix in sparse format
     
     print("Gram matrix in NPZ format")
     import scipy.sparse as sps
-    #gram_matrix = sps.lil_matrix(gram_matrix).tocoo()
-    sps.save_npz('sparse_gram.npz',gram_matrix.tocoo())
+    time_it(dp.write_sparse_gram_matrix,gram_matrix.tocoo(),dataset)
     print("Shape of Gram Matrix: " + str(np.shape(gram_matrix)))
 
     #dp.write_feature_vectors(feature_vectors, dataset, [])
@@ -161,6 +159,14 @@ def main():
 def format_time(millis):
     return datetime.datetime.fromtimestamp(millis).strftime('%Y-%m-%d %H:%M:%S.%f')
 
+def time_it(f,*args,**kwargs):
+    start = time.time()
+    print("Started function %s at %s" % (f.__name__,format_time(start)))
+    res = f(*args,**kwargs)
+    end = time.time()
+    print("Ended function %s at %s" % (f.__name__,format_time(end)))
+    print("Duration in [s]:\t%s\n" % str(end - start))
+    return res
 
 
 if __name__ == "__main__":

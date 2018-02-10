@@ -6,9 +6,9 @@ import graph_tool as gt
 import numpy as np
 import os.path as path
 import os 
-
+import scipy.sparse as sps
 PATH = os.environ['SEML_DATA'] + '/output/'
-#PATH = "datasets/"
+PATH = "datasets/"
 def read_txt(ds_name):
     return read_graph_db(ds_name), read_classes(ds_name)
 
@@ -175,3 +175,6 @@ def write_feature_vectors(feature_vectors, ds_name, classes=[]):
             f.write(s + "\n")
 #         f.write(feature_vectors.todense())
     f.closed
+
+def write_sparse_gram_matrix(gram_matrix,ds_name):
+    sps.save_npz(PATH + ds_name + "/" + ds_name + '_sparse_gram.npz',gram_matrix.tocoo())
