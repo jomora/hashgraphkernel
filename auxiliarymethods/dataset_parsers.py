@@ -8,7 +8,7 @@ import os.path as path
 import os 
 
 PATH = os.environ['SEML_DATA'] + '/output/'
-PATH = "datasets/"
+#PATH = "datasets/"
 def read_txt(ds_name):
     return read_graph_db(ds_name), read_classes(ds_name)
 

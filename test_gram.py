@@ -4,7 +4,7 @@ import numpy as np
 from auxiliarymethods import dataset_parsers as dp
 
 kernel_parameters_wl = [3, False, False, 0]
-graph_db, classes = dp.read_txt("ENZYMES")
+graph_db, classes = dp.read_txt("filter-25")
 num_vertices = 0
 for g in graph_db:
     num_vertices += g.num_vertices()

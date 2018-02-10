@@ -93,7 +93,7 @@ def main():
     start = time.time()
     print ("# Program started at " + format_time(start))
     dataset = "all"
-    dataset = "ENZYMES"
+    #dataset = "ENZYMES"
     print ("# Processing dataset: " + dataset)
     # Load ENZYMES data set
     graph_db, classes = dp.read_txt(dataset)
