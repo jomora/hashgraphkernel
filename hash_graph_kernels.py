@@ -11,6 +11,7 @@ from graphkernel import wl_kernel as wl
 import numpy as np
 import time
 import datetime
+from auxiliarymethods.logging import format_time, time_it
 
 # The Good
 algorithms = "algorithms"
@@ -156,17 +157,7 @@ def main():
     print ("# Program ended at ") + format_time(start)
     print ("# Duration in [s]: ") + str(end - start)
 
-def format_time(millis):
-    return datetime.datetime.fromtimestamp(millis).strftime('%Y-%m-%d %H:%M:%S.%f')
 
-def time_it(f,*args,**kwargs):
-    start = time.time()
-    print("Started function %s at %s" % (f.__name__,format_time(start)))
-    res = f(*args,**kwargs)
-    end = time.time()
-    print("Ended function %s at %s" % (f.__name__,format_time(end)))
-    print("Duration in [s]:\t%s\n" % str(end - start))
-    return res
 
 
 if __name__ == "__main__":
