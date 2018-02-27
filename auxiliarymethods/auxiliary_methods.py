@@ -5,7 +5,8 @@
 import math as m
 import numpy as np
 import scipy.sparse as sps
-
+import itertools
+    
 def normalize_gram_matrix(gram_matrix):
     n = gram_matrix.shape[0]
     gram_matrix_norm = sps.lil_matrix((n,n),dtype=np.float64) #np.zeros([n, n], dtype=np.float64)
@@ -18,6 +19,16 @@ def normalize_gram_matrix(gram_matrix):
 
     return gram_matrix_norm
 
+def normalize_sparse_gram_matrix(gram_matrix):
+    n = gram_matrix.shape[0]
+    tmp = gram_matrix.tocoo()
+    gram_matrix_norm = sps.lil_matrix((n,n),dtype=np.float64)
+    for i,j,v in itertools.izip(tmp.row, tmp.col, tmp.data):
+        if i <= j:
+            g = gram_matrix[i,j] / m.sqrt(gram_matrix[i,i] * gram_matrix[j,j])
+            gram_matrix_norm[i,j] = g
+            gram_matrix_norm[j,i] = g
+    return gram_matrix_norm
 
 def locally_sensitive_hashing(m, d, w, sigma=1.0):
     # Compute random projection vector
