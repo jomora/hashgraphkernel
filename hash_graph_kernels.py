@@ -12,7 +12,7 @@ import numpy as np
 import time
 import datetime
 from auxiliarymethods.logging import format_time, time_it
-
+from graphkernel import hash_graph_kernel_parallel as rbk_parallel
 # The Good
 algorithms = "algorithms"
 batch_events = "batch-events-1.0.0.RELEASE"
@@ -132,7 +132,8 @@ def main():
 
     # Compute gram matrix for HGK-SP
     # 20 is the number of iterations
-    gram_matrix, feature_vectors = time_it(rbk.hash_graph_kernel,graph_db, wl.weisfeiler_lehman_subtree_kernel, kernel_parameters_wl, 10, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0, use_gram_matrices=True)
+    gram_matrix, feature_vectors = time_it(rbk_parallel.hash_graph_kernel_parallel,graph_db, wl.weisfeiler_lehman_subtree_kernel, 
+        kernel_parameters_wl, 10, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0, use_gram_matrices=True)
  
     # Normalize gram matrix
     gram_matrix = aux.normalize_gram_matrix(gram_matrix)

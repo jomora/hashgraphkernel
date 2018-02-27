@@ -47,12 +47,14 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, iterations=20, l
             feature_vectors = tmp
         else:
             if use_gram_matrices:
+                print("ping")
                 feature_vectors = tmp
                 feature_vectors = feature_vectors.tocsr()
                 feature_vectors = m.sqrt(1.0 / iterations) * (feature_vectors)
                 gram_matrix += feature_vectors.dot(feature_vectors.T).toarray()
 
             else:
+                print("pong")
                 feature_vectors = sparse.hstack((feature_vectors, tmp))
 
     feature_vectors = feature_vectors.tocsr()
