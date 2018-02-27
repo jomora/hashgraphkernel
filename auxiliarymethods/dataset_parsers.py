@@ -7,6 +7,9 @@ import numpy as np
 import os.path as path
 import os 
 import scipy.sparse as sps
+import csv
+
+
 PATH = os.environ['SEML_DATA'] + '/output/'
 PATH = "datasets/"
 def read_txt(ds_name):
@@ -178,3 +181,25 @@ def write_feature_vectors(feature_vectors, ds_name, classes=[]):
 
 def write_sparse_gram_matrix(gram_matrix,ds_name):
     sps.save_npz(PATH + ds_name + "/" + ds_name + '_sparse_gram.npz',gram_matrix.tocoo())
+
+def read_sparse_gram(prefix):
+    return sps.load_npz(prefix + "_sparse_gram.npz")
+
+def read_graph_labels(prefix):
+    print(prefix)
+    graph_labels = []
+    with open(prefix + '_graph_labels.txt','r') as f:
+        for label in list(f):
+            graph_labels.append(int(label.strip()))
+    return graph_labels
+
+def writeToCsv(data, prefix, suffix):
+    with open(prefix + '_' + suffix + '.csv', 'w') as f:
+        csv_writer = csv.writer(f, delimiter=',')
+        for row in data:
+            csv_writer.writerow(row)
+
+def store_lambdas(data, prefix, suffix):
+    with open(prefix + '_' + suffix + '_lambdas' + '.csv', 'w') as f:
+        for entry in data:
+            f.write(str(entry) + "\n")
