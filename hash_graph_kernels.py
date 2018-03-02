@@ -13,90 +13,43 @@ import time
 import datetime
 from auxiliarymethods.logging import format_time, time_it
 from graphkernel import hash_graph_kernel_parallel as rbk_parallel
-# The Good
-algorithms = "algorithms"
-batch_events = "batch-events-1.0.0.RELEASE"
-batch_job = 'batch-job-1.0.0.RELEASE'
-commons_io = "commons-io-20030203.000550"
-commons_lang = 'commons-lang-20030203.000129'
-commons_lang3 = 'commons-lang3-3.7'
-guava_235 = 'guava-23.5-jre'
-junit_412 = 'junit-4.12'
-log4j_1217 = 'log4j-1.2.17'
-logback_classic = 'logback-classic-1.2.3'
-mockito_all = 'mockito-all-2.0.2-beta'
-partitioned_batch_job = 'partitioned-batch-job-1.0.0.RELEASE'
-platform_208 = 'platform-2.0.8.RELEASE'
-slf4j_api_180 = 'slf4j-api-1.8.0-beta0'
-slf4j_log4j12_180 = 'slf4j-log4j12-1.8.0-beta0'
-spring_context = 'spring-context-5.0.1.RELEASE'
-spring_context_indexer = "spring-context-indexer-5.0.1.RELEASE"
-spring_context_support = 'spring-context-support-5.0.1.RELEASE'
-task_events = 'task-events-1.0.0.RELEASE'
-taskprocessor = 'taskprocessor-1.0.0.RELEASE'
-tasksink = 'tasksink-1.0.0.RELEASE'
-timestamp_task = 'timestamp-task-1.0.0.RELEASE'
 
-# The Bad
-spring_security_core = 'spring-security-core-5.0.0.RELEASE'
-lucene_core = 'lucene-core-7.1.0'
-dom4j = 'dom4j-2.1.0'
-slf4j_jdk14 = 'slf4j-jdk14-1.8.0-beta0'
-plexus_utils = 'plexus-utils-3.1.0'
-powermock_module_junit4 = 'powermock-module-junit4-2.0.0-beta.5'
-powermock_api_mockito = 'powermock-api-mockito-1.7.3'
-netty_all = 'netty-all-5.0.0.Alpha2'
-jsoup = "jsoup-1.11.2"
-xstream = 'xstream-1.4.10-java7'
-groovy_all = 'groovy-all-3.0.0-alpha-1'
 
-good_datasets = [
-algorithms,
-batch_events,
-batch_job,
-commons_io,
-commons_lang,
-commons_lang3,
-# guava_235,
-junit_412,
-log4j_1217,
-logback_classic,
-mockito_all,
-partitioned_batch_job,
-# platform_208,
-slf4j_api_180,
-slf4j_log4j12_180,
-spring_context,
-spring_context_indexer,
-spring_context_support,
-task_events,
-taskprocessor,
-tasksink,
-timestamp_task 
-    ]
+import argparse
 
-bad_datasets = [
-spring_security_core,
-# lucene_core ,
-dom4j,
-slf4j_jdk14,
-plexus_utils,
-powermock_module_junit4,
-powermock_api_mockito,
-# netty_all,
-jsoup,
-xstream
-# groovy_all 
-]
+
+
 
 
 def main():
+
+    parser = argparse.ArgumentParser(description='Run the  Hash Graph Kernel')
+    parser.add_argument('-ds','--dataset', action="store", dest="dataset",
+        help="The name of the dataset (must match the directory" \
+            " name in which the datset is stored, and the prefix" \
+            " of all files in the dataset directors.")
+    parser.add_argument('-b', '--base',action="store", dest="base",
+        help="The base directory in which the datset directory is located")
+    
+    args = parser.parse_args()
+    problem = False
+    if args.dataset == None:
+        print("# No dataset given")
+        problem = True
+    if args.base == None:
+        print("# No base directory given")
+        problem = True
+    if problem:
+        print("--> Argument error: exiting")
+        exit(0)
+    dataset = args.dataset
+    PATH = args.base
     start = time.time()
     print ("# Program started at " + format_time(start))
     #dataset = "all"
-    dataset = "ENZYMES"
+    #dataset = "ENZYMES"
     # PATH = os.environ['SEML_DATA'] + '/output/'
-    PATH = "datasets/"
+    # PATH = "datasets/"
 
     dp = DatasetParser(PATH)
 
