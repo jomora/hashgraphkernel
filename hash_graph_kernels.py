@@ -30,7 +30,8 @@ def main():
             " of all files in the dataset directors.")
     parser.add_argument('-b', '--base',action="store", dest="base",
         help="The base directory in which the datset directory is located")
-    
+    parser.add_argument('-p','--parallel', action="store_true",dest='parallel', default=False)
+
     args = parser.parse_args()
     problem = False
     if args.dataset == None:
@@ -44,6 +45,7 @@ def main():
         exit(0)
     dataset = args.dataset
     PATH = args.base
+    parallel = args.parallel
     start = time.time()
     print ("# Program started at " + format_time(start))
     #dataset = "all"
@@ -90,13 +92,15 @@ def main():
 
     # Compute gram matrix for HGK-SP
     # 20 is the number of iterations
-    gram_matrix, feature_vectors = time_it(rbk_parallel.hash_graph_kernel_parallel,graph_db, wl.weisfeiler_lehman_subtree_kernel, 
-        kernel_parameters_wl, 10, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0, use_gram_matrices=True)
- 
+    if parallel:
+        gram_matrix, feature_vectors = time_it(rbk_parallel.hash_graph_kernel_parallel,graph_db, wl.weisfeiler_lehman_subtree_kernel, 
+            kernel_parameters_wl, 10, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0, use_gram_matrices=True)
+    else:
+        gram_matrix, feature_vectors = time_it(rbk.hash_graph_kernel,graph_db, wl.weisfeiler_lehman_subtree_kernel, 
+            kernel_parameters_wl, 10, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0, use_gram_matrices=True)
     # Normalize gram matrix
     gram_matrix = time_it(aux.normalize_gram_matrix,gram_matrix)
 
-#    print (feature_vectors.todense())
     print ("Shape of feature vectors: " + str(feature_vectors.shape))
 
     # Write out LIBSVM matrix
