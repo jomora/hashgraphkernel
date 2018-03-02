@@ -4,7 +4,7 @@
 # Email: christopher.morris at udo.edu
 
 from auxiliarymethods import auxiliary_methods as aux
-from auxiliarymethods import dataset_parsers as dp
+from auxiliarymethods.dataset_parsers import DatasetParser
 from graphkernel import hash_graph_kernel as rbk
 from graphkernel import shortest_path_kernel_explicit as sp_exp
 from graphkernel import wl_kernel as wl
@@ -95,6 +95,11 @@ def main():
     print ("# Program started at " + format_time(start))
     #dataset = "all"
     dataset = "ENZYMES"
+    # PATH = os.environ['SEML_DATA'] + '/output/'
+    PATH = "datasets/"
+
+    dp = DatasetParser(PATH)
+
     print ("# Processing dataset: " + dataset)
     # Load ENZYMES data set
     graph_db, classes = time_it(dp.read_txt,(dataset))
@@ -136,10 +141,10 @@ def main():
         kernel_parameters_wl, 10, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0, use_gram_matrices=True)
  
     # Normalize gram matrix
-    gram_matrix = aux.normalize_gram_matrix(gram_matrix)
+    gram_matrix = time_it(aux.normalize_gram_matrix,gram_matrix)
 
-    print (feature_vectors.todense())
-    print ("Shape of feature vectors: " + str(feature_vectors.todense().shape))
+#    print (feature_vectors.todense())
+    print ("Shape of feature vectors: " + str(feature_vectors.shape))
 
     # Write out LIBSVM matrix
     #dp.write_lib_svm(gram_matrix, classes, "gram_matrix")
