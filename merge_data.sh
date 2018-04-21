@@ -50,8 +50,8 @@ done
 header="$header,return,method,project"
 echo "$header" > dataset.tmp
 
-cat filter-5-1_id_method_map.txt  | cut -d' ' -f2,3 > id_method_map.tmp
-cat filter-5-1_method_project_map.txt | cut -d' ' -f2 > method_project_map.tmp
+cat "${dataset}_id_method_map.txt"  | cut -d' ' -f2,3 > id_method_map.tmp
+cat "${dataset}_method_project_map.txt" | cut -d' ' -f2 > method_project_map.tmp
 # Replace comma in method parameter list by semicolon
 pr -mts' ' id_method_map.tmp method_project_map.tmp | tr "," ";" | tr " " "," > id_method_project_map.tmp
 

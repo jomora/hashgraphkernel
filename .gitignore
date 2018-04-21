@@ -5,3 +5,5 @@
 gram_*
 *.npz
 *.swp
+.cache
+datasets/

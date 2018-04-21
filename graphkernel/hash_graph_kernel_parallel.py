@@ -46,8 +46,10 @@ def hash_graph_kernel_parallel(graph_db, base_kernel, kernel_parameters, iterati
         tmp = base_kernel(graph_db, hashed_attributes, *kwargs)
         queue.put(tmp)
 
-    from multiprocessing import Process,Queue
+    from multiprocessing import Process,Queue,Pool
     queues_and_processes = []
+    pool = Pool(processes=2) 
+       
     for i in xrange(0,iterations):
         q = Queue()
         p = Process(target=run_base_kernel_parallel, args=(q,graph_db,colors_hashed_list[i],kernel_parameters))

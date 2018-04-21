@@ -32,6 +32,16 @@ def main():
 
 	spectral = SpectralClustering(n_clusters=3,eigen_solver='arpack')#,affinity="nearest_neighbors")
 	spectral_labels = spectral.fit_predict(X_kpca)#[subsampled_indices])
+	N = spectral_labels.shape[0]
+	uni  = np.unique(spectral_labels)
+	class_dist = []
+	for i in uni:
+		prior = float(np.sum(spectral_labels == i))/N
+		class_dist.append((i,prior))
+		print("Class %d: %f" % (i,prior))
+	print(class_dist)
+
+
 	with open(prefix + "_labels-" + str(components) + ".csv","w") as f:
 		for label in spectral_labels:
 			f.write( str(label) + '\n')

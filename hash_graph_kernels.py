@@ -57,9 +57,8 @@ def main():
 
     print ("# Processing dataset: " + dataset)
     # Load ENZYMES data set
-    graph_db, classes = time_it(dp.read_txt,(dataset))
-
-#     graph_db = dp.read_graph_db(dataset)
+    # graph_db, classes = time_it(dp.read_txt,(dataset))
+    graph_db = time_it(dp.read_graph_db,dataset)
     
     # Parameters used: 
     # Compute gram matrix: False, 
@@ -72,7 +71,7 @@ def main():
     # Compute gram matrix: False, 
     # Normalize gram matrix: False
     # Use discrete labels: False
-    kernel_parameters_wl = [3, False, False, 0]
+    kernel_parameters_wl = [3, True, False, 0]
 
     # Use discrete labels, too
     # kernel_parameters_sp = [False, False, 1]
@@ -94,10 +93,10 @@ def main():
     # 20 is the number of iterations
     if parallel:
         gram_matrix, feature_vectors = time_it(rbk_parallel.hash_graph_kernel_parallel,graph_db, wl.weisfeiler_lehman_subtree_kernel, 
-            kernel_parameters_wl, 10, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0, use_gram_matrices=True)
+            kernel_parameters_wl, 10, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0, use_gram_matrices=True,normalize_gram_matrix=False)
     else:
         gram_matrix, feature_vectors = time_it(rbk.hash_graph_kernel,graph_db, wl.weisfeiler_lehman_subtree_kernel, 
-            kernel_parameters_wl, 10, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0, use_gram_matrices=True)
+            kernel_parameters_wl, 10, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0, use_gram_matrices=True,normalize_gram_matrix=False)
     # Normalize gram matrix
     gram_matrix = time_it(aux.normalize_gram_matrix,gram_matrix)
 
@@ -107,13 +106,16 @@ def main():
     #dp.write_lib_svm(gram_matrix, classes, "gram_matrix")
 
     # Write out simple Gram matrix used for clustering
-    time_it(dp.write_gram_matrix,gram_matrix, dataset)
+    # time_it(dp.write_gram_matrix,gram_matrix, dataset)
     # Write out simple Gram matrix in sparse format
     
     print("Gram matrix in NPZ format")
     import scipy.sparse as sps
     time_it(dp.write_sparse_gram_matrix,gram_matrix.tocoo(),dataset)
     print("Shape of Gram Matrix: " + str(np.shape(gram_matrix)))
+
+
+    time_it(dp.write_gram_matrix,gram_matrix.todense(),dataset)
 
     #dp.write_feature_vectors(feature_vectors, dataset, [])
     end = time.time()

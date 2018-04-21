@@ -25,7 +25,7 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, iterations=20, l
     offset = 0
 
     gram_matrix = sparse.lil_matrix((n,n),dtype=np.float64).tocsr() #np.zeros([n, n])
-
+    
     # Get attributes from all graph instances
     graph_indices = []
     for g in graph_db:
@@ -47,14 +47,11 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, iterations=20, l
             feature_vectors = tmp
         else:
             if use_gram_matrices:
-                print("ping")
                 feature_vectors = tmp
                 feature_vectors = feature_vectors.tocsr()
                 feature_vectors = m.sqrt(1.0 / iterations) * (feature_vectors)
-                gram_matrix += feature_vectors.dot(feature_vectors.T).toarray()
-
+                gram_matrix += feature_vectors.dot(feature_vectors.T)
             else:
-                print("pong")
                 feature_vectors = sparse.hstack((feature_vectors, tmp))
 
     feature_vectors = feature_vectors.tocsr()
@@ -65,8 +62,7 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, iterations=20, l
         # Compute Gram matrix
         gram_matrix = feature_vectors.dot(feature_vectors.T)
         #gram_matrix = gram_matrix.toarray()
-
+    
     if normalize_gram_matrix:
         gram_matrix = aux.normalize_gram_matrix(gram_matrix)
-
     return gram_matrix,feature_vectors
