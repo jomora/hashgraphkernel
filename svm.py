@@ -15,11 +15,15 @@ def main():
             " of all files in the dataset directors.")
     parser.add_argument('-b', '--base',action="store", dest="base",
         help="The base directory in which the datset directory is located")
+    parser.add_argument('-c','--components', action="store",type=int,dest='components', default=3)
+
     args = parser.parse_args()
     # Fetch params
     ds_path = args.base
     ds_name = args.dataset
-    path = ds_path + "/" + ds_name + "/" + ds_name + "_labels-3.csv"
+    components = args.components
+
+    path = ds_path + "/" + ds_name + "/" + ds_name + "_labels-" + str(components) + ".csv"
     print(path)
     with open(path,"r") as f:
         labels = []

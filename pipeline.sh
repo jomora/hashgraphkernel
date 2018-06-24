@@ -54,7 +54,9 @@ function read_principal_components(){
 function graphbuilder(){
 	cd "$SEML/code/graphbuilder/"
 	# Run ram.sh to set JAVA_OPTS environment variable
-	source "./ram.sh"
+	
+	source "./ram.sh" 6
+
 	# Example call:
 	# sbt "run -in=../../data/examples/test -out=examples_out -ds=test"
 	echo "Running graphbuilder"
@@ -96,7 +98,8 @@ function spectral_clustering() {
 function svm() {
 	echo "Press [ENTER] to go on"
 	read
-	time python2 svm.py -ds "$dataset" -b "$SEML_DATA/$output_dir/"
+	read_principal_components
+	time python2 svm.py -ds "$dataset" -b "$SEML_DATA/$output_dir/" -c "$principal_components"
 }
 
 
