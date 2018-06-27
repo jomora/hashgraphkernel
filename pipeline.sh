@@ -47,20 +47,34 @@ function read_principal_components(){
 	fi
 }
 
+
+
 ### ### #### ### ###
 # RUN GRAPHBUILDER #
 ### ### #### ### ###
 
-function graphbuilder(){
+function graphbuilder_create_db(){
 	cd "$SEML/code/graphbuilder/"
 	# Run ram.sh to set JAVA_OPTS environment variable
-	
+
 	source "./ram.sh" 6
 
 	# Example call:
 	# sbt "run -in=../../data/examples/test -out=examples_out -ds=test"
-	echo "Running graphbuilder"
-	time sbt "run -in=$input_dir -out=$output_dir -ds=$dataset"
+	echo "Running graphbuilder: create-db"
+	time sbt "run create-db -in=$input_dir -out=$output_dir -ds=$dataset"
+}
+
+function graphbuilder_read_db(){
+	cd "$SEML/code/graphbuilder/"
+	# Run ram.sh to set JAVA_OPTS environment variable
+
+	source "./ram.sh" 6
+
+	# Example call:
+	# sbt "run -in=../../data/examples/test -out=examples_out -ds=test"
+	echo "Running graphbuilder: read-db"
+	time sbt "run read-db -in=$input_dir -out=$output_dir -ds=$dataset"
 }
 
 ### ### #### #### ### ###
@@ -90,7 +104,18 @@ function spectral_clustering() {
 	echo "Press [ENTER] to go on"
 	read
 	read_principal_components
-	time python2 spectral_clustering.py -ds "$dataset" -b "$SEML_DATA/$output_dir/" -c $principal_components
+
+	echo "Enter number of clusters to compute:"
+	local clusters=0
+	read clusters
+	if [ -z "$clusters" ]; then
+		echo "Using default value: 3"
+		clusters=3
+	else
+		echo "Using $clusters clusters"
+	fi
+
+	time python2 spectral_clustering.py -ds "$dataset" -b "$SEML_DATA/$output_dir/" -c $principal_components --clusters $clusters
 }
 ### #### ###
 # RUN SVM  #
@@ -102,39 +127,55 @@ function svm() {
 	time python2 svm.py -ds "$dataset" -b "$SEML_DATA/$output_dir/" -c "$principal_components"
 }
 
-
+### #### ###
+# COMPUTE ...  #
+### #### ###
+function method_class_frequencies() {
+	echo "Press [ENTER] to go on"
+	read
+	read_principal_components
+	time python2 method_class_frequencies.py -in "$input_dir" -ds "$dataset" -b "$SEML_DATA/$output_dir/" -c "$principal_components"
+}
 
 input_dir=$1
 output_dir=$2
 dataset=$3
 
 echo "Please select what you want to do:"
-echo "[1] Graphbuilder"
-echo "[2] Hash Graph Kernel"
-echo "[3] Kernel PCA"
-echo "[4] Spectral Clustering"
-echo "[5] SVM"
-echo "[6] all of the above"
+echo "[1] Graphbuilder create-db"
+echo "[2] Graphbuilder read-db"
+echo "[3] Hash Graph Kernel"
+echo "[4] Kernel PCA"
+echo "[5] Spectral Clustering"
+echo "[6] SVM"
+echo "[7] Frequencies"
+echo "[8] all of the above"
 read selection
 case $selection in
 	[1]*)
-		graphbuilder
+		graphbuilder_create_db
 		;;
-
 	[2]*)
-		hgk
+		graphbuilder_read_db
 		;;
 	[3]*)
-		kernel_pca
+		hgk
 		;;
 	[4]*)
-		spectral_clustering
+		kernel_pca
 		;;
 	[5]*)
-		svm
+		spectral_clustering
 		;;
 	[6]*)
-		graphbuilder
+		svm
+		;;
+	[7]*)
+		method_class_frequencies
+		;;
+	[8]*)
+		graphbuilder_create_db
+		graphbuilder_read_db
 		hgk
 		kernel_pca
 		spectral_clustering
