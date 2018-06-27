@@ -67,5 +67,15 @@ def main():
     for project,index in project_index_map.items():
         print( np.array2string(project_class_counts[index]) + " // " + project)
 
+    # For all projects: compute class ratios
+    class_ratios = [project_class_counts[i,:] /np.sum(project_class_counts[i,:]) for i in range(project_class_counts.shape[0])]
+    print("For all projects: compute class ratios:")
+    print(class_ratios)
+
+    # For all classes: compute project ratios
+    project_ratios = [project_class_counts[:,j] /np.sum(project_class_counts[:,j]) for j in range(project_class_counts.shape[1])]
+    print("For all classes: compute project ratios:")
+    print(project_ratios)
+    
 if __name__ == "__main__":
     main()
