@@ -54,7 +54,7 @@ function read_principal_components(){
 ### ### #### ### ###
 
 function graphbuilder_create_db(){
-	cd "$SEML/code/graphbuilder/"
+	cd "$SEML_CODE/graphbuilder/"
 	# Run ram.sh to set JAVA_OPTS environment variable
 
 	source "./ram.sh" 6
@@ -62,11 +62,11 @@ function graphbuilder_create_db(){
 	# Example call:
 	# sbt "run -in=../../data/examples/test -out=examples_out -ds=test"
 	echo "Running graphbuilder: create-db"
-	time sbt "run create-db -in=$input_dir -out=$output_dir -ds=$dataset"
+	time $SBT_HOME/bin/sbt "run create-db -in=$input_dir -out=$output_dir -ds=$dataset"
 }
 
 function graphbuilder_read_db(){
-	cd "$SEML/code/graphbuilder/"
+	cd "$SEML_CODE/graphbuilder/"
 	# Run ram.sh to set JAVA_OPTS environment variable
 
 	source "./ram.sh" 6
@@ -84,7 +84,7 @@ function hgk(){
 	echo "Press [ENTER] to go on"
 	read
 
-	cd "$SEML/code/examples/hashgraphkernel/"
+	cd "$SEML_CODE/hashgraphkernel/"
 	echo "Running Hash Graph Kernel"
 	ls -1
 	time python2 hash_graph_kernels.py -ds "$dataset" -b "$SEML_DATA/$output_dir/"
@@ -140,6 +140,8 @@ function method_class_frequencies() {
 input_dir=$1
 output_dir=$2
 dataset=$3
+
+source env.cfg
 
 echo "Please select what you want to do:"
 echo "[1] Graphbuilder create-db"
