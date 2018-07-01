@@ -62,7 +62,7 @@ function graphbuilder_create_db(){
 	# Example call:
 	# sbt "run -in=../../data/examples/test -out=examples_out -ds=test"
 	echo "Running graphbuilder: create-db"
-	time $SBT_HOME/bin/sbt "run create-db -in=$input_dir -out=$output_dir -ds=$dataset"
+	time $SBT_HOME/bin/sbt "run create-db -in="$SEML_DATA/$input_dir" -out=$output_dir -ds=$dataset"
 }
 
 function graphbuilder_read_db(){
@@ -74,7 +74,7 @@ function graphbuilder_read_db(){
 	# Example call:
 	# sbt "run -in=../../data/examples/test -out=examples_out -ds=test"
 	echo "Running graphbuilder: read-db"
-	time sbt "run read-db -in=$input_dir -out=$output_dir -ds=$dataset"
+	time sbt "run read-db -in="$SEML_DATA/$input_dir" -out=$output_dir -ds=$dataset"
 }
 
 ### ### #### #### ### ###
@@ -134,7 +134,7 @@ function method_class_frequencies() {
 	echo "Press [ENTER] to go on"
 	read
 	read_principal_components
-	time python2 method_class_frequencies.py -in "$input_dir" -ds "$dataset" -b "$SEML_DATA/$output_dir/" -c "$principal_components"
+	time python2 method_class_frequencies.py -in "$SEML_DATA/$input_dir" -ds "$dataset" -b "$SEML_DATA/$output_dir/" -c "$principal_components"
 }
 
 input_dir=$1
@@ -146,12 +146,21 @@ if  [ -f "$SERVER_ENV" ] && [ -f "$LAPTOP_ENV" ]; then
     echo "Choose config:"
     echo "[1] $SERVER_ENV"
     echo "[2] $LAPTOP_ENV"
-    read choice
-fi
-if [ -f "$SERVER_ENV" ] || [ "$choice" == 1 ]; then
+    read -p "Enter choice: " choice
+    if [ "$choice" == 1 ] ; then
+        echo "Sourcing $SERVER_ENV"
+        source "$SERVER_ENV"
+    elif [ "$choice" == 2 ] ; then
+        echo "Sourcing $LAPTOP_ENV"
+        source "$LAPTOP_ENV"
+    else
+        echo "No proper choice made: exiting"
+	exit 0
+    fi
+elif [ -f "$SERVER_ENV" ] ; then
     echo "Sourcing $SERVER_ENV"
     source "$SERVER_ENV"
-elif [ -f "$LAPTOP_ENV" ] || [ "$choice" == 2 ]; then
+elif [ -f "$LAPTOP_ENV" ] ; then
     echo "Sourcing $LAPTOP_ENV"
     source "$LAPTOP_ENV"
 else
@@ -159,11 +168,11 @@ else
     exit 1
 fi
 
-${SEML_CODE:?Variable SEML_CODE not set}
-${SEML_DATA:?Variable SEML_DATA not set}
+#${SEML_CODE:?Variable SEML_CODE not set}
+#${SEML_DATA:?Variable SEML_DATA not set}
 
-${SBT_HOME:?Variable SBT_HOME not set}
-${JAVA_HOME:?Variable JAVA_HOME not set}
+#${SBT_HOME:?Variable SBT_HOME not set}
+#${JAVA_HOME:?Variable JAVA_HOME not set}
 
 echo "Please select what you want to do:"
 echo "[1] Graphbuilder create-db"
