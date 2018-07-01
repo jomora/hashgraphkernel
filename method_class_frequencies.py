@@ -80,5 +80,9 @@ def main():
     for i in range(project_ratios.shape[0]):
         print("Class " + str(i) + ": " + np.array2string(project_ratios[i,:]).replace('\n', ''))
 
+
+    np.save(file=base_path + "_class_ratios.txt",allow_pickle=False,arr=class_ratios)
+    np.save(file=base_path + "_project_ratios.txt",allow_pickle=False,arr=project_ratios)
+
 if __name__ == "__main__":
     main()

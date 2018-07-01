@@ -137,6 +137,24 @@ function method_class_frequencies() {
 	time python2 method_class_frequencies.py -in "$SEML_DATA/$input_dir" -ds "$dataset" -b "$SEML_DATA/$output_dir/" -c "$principal_components"
 }
 
+### #### ### ### ### ### ###
+# COMPUTE PROJECT CLUSTERS  #
+### #### ### ### ### ### ###
+function project_clustering() {
+	echo "Press [ENTER] to go on"
+	echo "Enter number of clusters to compute:"
+	local clusters=0
+	read clusters
+	if [ -z "$clusters" ]; then
+		echo "Using default value: 3"
+		clusters=3
+	else
+		echo "Using $clusters clusters"
+	fi
+
+	time python2 project_clustering.py -ds "$dataset" -b "$SEML_DATA/$output_dir/" --clusters $clusters
+}
+
 input_dir=$1
 output_dir=$2
 dataset=$3
@@ -182,7 +200,8 @@ echo "[4] Kernel PCA"
 echo "[5] Spectral Clustering"
 echo "[6] SVM"
 echo "[7] Frequencies"
-echo "[8] all of the above"
+echo "[8] Project Clustering"
+echo "[9] all of the above"
 read selection
 case $selection in
 	[1]*)
@@ -207,6 +226,9 @@ case $selection in
 		method_class_frequencies
 		;;
 	[8]*)
+		project_clustering
+		;;
+	[9]*)
 		graphbuilder_create_db
 		graphbuilder_read_db
 		hgk
