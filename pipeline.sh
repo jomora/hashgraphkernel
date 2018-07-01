@@ -140,8 +140,30 @@ function method_class_frequencies() {
 input_dir=$1
 output_dir=$2
 dataset=$3
+SERVER_ENV="./server-env.cfg"
+LAPTOP_ENV="./laptop-env.cfg"
+if  [ -f "$SERVER_ENV" ] && [ -f "$LAPTOP_ENV" ]; then
+    echo "Choose config:"
+    echo "[1] $SERVER_ENV"
+    echo "[2] $LAPTOP_ENV"
+    read choice
+fi
+if [ -f "$SERVER_ENV" ] || [ "$choice" == 1 ]; then
+    echo "Sourcing $SERVER_ENV"
+    source "$SERVER_ENV"
+elif [ -f "$LAPTOP_ENV" ] || [ "$choice" == 2 ]; then
+    echo "Sourcing $LAPTOP_ENV"
+    source "$LAPTOP_ENV"
+else
+    echo "Couldn't load environment: $SERVER_ENV/$LAPTOP_ENV not present!"
+    exit 1
+fi
 
-source env.cfg
+${SEML_CODE:?Variable SEML_CODE not set}
+${SEML_DATA:?Variable SEML_DATA not set}
+
+${SBT_HOME:?Variable SBT_HOME not set}
+${JAVA_HOME:?Variable JAVA_HOME not set}
 
 echo "Please select what you want to do:"
 echo "[1] Graphbuilder create-db"
