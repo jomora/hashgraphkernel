@@ -19,10 +19,10 @@ def main():
 	ds_name = args.dataset
 	prefix = ds_path + ds_name + '/' + ds_name
 	clusters = args.clusters
-	np.load(prefix + "_project_ratios.txt")
-	#subsampled_indices = np.random.choice(X_kpca.shape[0],200,replace=False)
+	data = np.load(prefix + "_project_ratios.txt.npy")
+
 	kmeans = KMeans(n_clusters=clusters,n_init=1 )
-	labels = kmeans.fit_predict(X_kpca)#[subsampled_indices])
+	labels = kmeans.fit_predict(data)#[subsampled_indices])
 	N = labels.shape[0]
 	uni  = np.unique(labels)
 	class_dist = []
