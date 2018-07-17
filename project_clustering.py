@@ -20,10 +20,17 @@ def main():
 	prefix = ds_path + ds_name + '/' + ds_name
 	clusters = args.clusters
 	data = np.load(prefix + "_project_ratios.txt.npy")
+        with open(prefix + "_id_project_map.txt") as f:
+            id_project_map = dict([[elems for elems in line.strip().split(" ")] for line in f])
+        id_project_map = {int(k):v for (k,v) in id_project_map.items()}
 
 	kmeans = KMeans(n_clusters=clusters,n_init=1 )
 	labels = kmeans.fit_predict(data)#[subsampled_indices])
+        for i,l in enumerate(labels):
+            print("Project %d, label: %d (%s)" % (i,l,id_project_map[i]))
+
 	N = labels.shape[0]
+
 	uni  = np.unique(labels)
 	class_dist = []
 	for i in uni:
