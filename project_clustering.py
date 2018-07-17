@@ -19,7 +19,7 @@ def main():
 	ds_name = args.dataset
 	prefix = ds_path + ds_name + '/' + ds_name
 	clusters = args.clusters
-	data = np.load(prefix + "_project_ratios.txt.npy")
+	data = np.load(prefix + "_class_ratios.txt.npy")
         with open(prefix + "_id_project_map.txt") as f:
             id_project_map = dict([[elems for elems in line.strip().split(" ")] for line in f])
         id_project_map = {int(k):v for (k,v) in id_project_map.items()}
@@ -37,8 +37,8 @@ def main():
 		prior = float(np.sum(labels == i))/N
 		class_dist.append((i,prior))
 		print("Class %d: %f" % (i,prior))
-	print(class_dist)
-
+	#print(class_dist)
+        print(data)
 
 
 	# with open(prefix + "_labels-" + str(components) + ".csv","w") as f:
