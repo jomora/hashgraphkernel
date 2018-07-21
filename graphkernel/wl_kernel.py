@@ -90,7 +90,7 @@ def weisfeiler_lehman_subtree_kernel(graph_db, hashed_attributes, *kwargs):
         return sp.sparse.vstack(feature_vectors) #lil.lil_matrix(feature_vectors)
     else:
         # Make feature vectors sparse
-        gram_matrix = csr.csr_matrix(feature_vectors, dtype=np.float64)
+        gram_matrix = csr.csr_matrix(sp.sparse.vstack(feature_vectors), dtype=np.float64)
         # Compute gram matrix
         gram_matrix = gram_matrix.dot(gram_matrix.T)
 

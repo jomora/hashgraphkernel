@@ -16,4 +16,7 @@ jarCounters =  [(item,count) for item, count in collections.Counter(jars).items(
 print [proj for proj,count in jarCounters if count > 18]
 
 for i in range(0,30):
-    print(str(i) + ": "+str(len([proj for proj,count in jarCounters if count > i])))
+    print(str(i) + ": "+str(len([proj for proj,count in jarCounters if count == i])))
+
+for i in range(30):
+    print("\hline\n" + str(i) + " & "+str(len([proj for proj,count in jarCounters if count == i])) + " \\\\")
