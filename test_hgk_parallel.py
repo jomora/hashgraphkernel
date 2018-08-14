@@ -29,10 +29,10 @@ def test_rbk_enzymes():
         return hashes.next()
 
     hash_function = hashing #aux.locally_sensitive_hashing
-    gram_matrix_1, feature_vectors_1 = rbk.hash_graph_kernel(graph_db, wl.weisfeiler_lehman_subtree_kernel,
+    gram_matrix_1, feature_vectors_1 = rbk_parallel.hash_graph_kernel(graph_db, wl.weisfeiler_lehman_subtree_kernel,
         kernel_parameters_wl, hash_function, 20, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0,
         use_gram_matrices=True,normalize_gram_matrix=True)
-    gram_matrix_2, feature_vectors_2 = rbk.hash_graph_kernel(graph_db, wl.weisfeiler_lehman_subtree_kernel,
+    gram_matrix_2, feature_vectors_2 = rbk_parallel.hash_graph_kernel(graph_db, wl.weisfeiler_lehman_subtree_kernel,
         kernel_parameters_wl,hash_function, 20, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0,
         use_gram_matrices=True,normalize_gram_matrix=True)
 
