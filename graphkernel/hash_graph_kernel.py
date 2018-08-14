@@ -11,7 +11,7 @@ from auxiliarymethods import auxiliary_methods as aux
 from setuptools.dist import Feature
 
 
-def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, iterations=20, lsh_bin_width=1.0, sigma=1.0,
+def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, hashing, iterations=20, lsh_bin_width=1.0, sigma=1.0,
                       normalize_gram_matrix=True, use_gram_matrices=False, scale_attributes=True):
     num_vertices = 0
     for g in graph_db:
@@ -25,7 +25,7 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, iterations=20, l
     offset = 0
 
     gram_matrix = sparse.lil_matrix((n,n),dtype=np.float64).tocsr() #np.zeros([n, n])
-    
+
     # Get attributes from all graph instances
     graph_indices = []
     for g in graph_db:
@@ -40,7 +40,7 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, iterations=20, l
         colors_0 = pre.scale(colors_0, axis=0)
 
     for it in xrange(0, iterations):
-        colors_hashed = aux.locally_sensitive_hashing(colors_0, dim_attributes, lsh_bin_width, sigma=sigma)
+        colors_hashed = hashing(colors_0, dim_attributes, lsh_bin_width, sigma=sigma)
 
         tmp = base_kernel(graph_db, colors_hashed, *kernel_parameters)
         if it == 0 and not use_gram_matrices:
@@ -62,7 +62,7 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, iterations=20, l
         # Compute Gram matrix
         gram_matrix = feature_vectors.dot(feature_vectors.T)
         #gram_matrix = gram_matrix.toarray()
-    
+
     if normalize_gram_matrix:
         gram_matrix = aux.normalize_gram_matrix(gram_matrix)
     return gram_matrix,feature_vectors
