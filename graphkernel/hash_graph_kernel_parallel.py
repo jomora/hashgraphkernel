@@ -52,11 +52,11 @@ def hash_graph_kernel_parallel(graph_db, base_kernel, kernel_parameters, hashing
         colors_0 = pre.scale(colors_0, axis=0)
 
     # Create hashed colors in advance for every iteration
-    colors_hashed_list = [hashing(colors_0,
-                                dim_attributes,
-                                lsh_bin_width,
-                                sigma=sigma)
-                for it in xrange(0, iterations)]
+    # colors_hashed_list = [hashing(colors_0,
+    #                             dim_attributes,
+    #                             lsh_bin_width,
+    #                             sigma=sigma)
+    #             for it in xrange(0, iterations)]
 
 
 
@@ -65,7 +65,10 @@ def hash_graph_kernel_parallel(graph_db, base_kernel, kernel_parameters, hashing
     pool = Pool(processes=10)
 
 
-    TASKS = [(base_kernel,(graph_db, colors_hashed_list[i], kernel_parameters)) for i in xrange(0,iterations)]
+    TASKS = [(base_kernel,(graph_db, hashing(colors_0,
+                                dim_attributes,
+                                lsh_bin_width,
+                                sigma=sigma), kernel_parameters)) for i in xrange(0,iterations)]
 
     print ("# Starting pool at " + format_time(time.time()))
     results = pool.map_async(run_base_kernel_parallel, TASKS,chunksize=1)
