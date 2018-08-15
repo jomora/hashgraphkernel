@@ -62,15 +62,26 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, hashing, iterati
         gram_matrix = feature_vectors.dot(feature_vectors.T)
         #gram_matrix = gram_matrix.toarray()
     else: # if use_gram_matrices
+        print ("# Using gram matrix " + format_time(time.time()))
         print ("# Starting loop at " + format_time(time.time()))
+
+        # TASKS = [(base_kernel,graph_db, hashing(colors_0,
+        #                             dim_attributes,
+        #                             lsh_bin_width,
+        #                             sigma=sigma), kernel_parameters)
+        #                             for i in xrange(0,iterations)]
+
+        # pool = Pool(processes=10)
+        # results = pool.map_async(run_base_kernel_parallel, TASKS,chunksize=1)
+        #
+        # pool.close()
+        # pool.join()
         for it in xrange(0, iterations):
             colors_hashed = hashing(colors_0, dim_attributes, lsh_bin_width, sigma=sigma)
-            tmp = base_kernel(graph_db, colors_hashed, *kernel_parameters)
-            feature_vectors = tmp
-            feature_vectors = m.sqrt(1.0 / iterations) * (feature_vectors)
-            gram_matrix += feature_vectors.dot(feature_vectors.T)
-
+            gram_matrix += compute_gram_parallel((base_kernel, iterations, graph_db, colors_hashed, kernel_parameters))
+        feature_vectors = []    
         print ("# Ending loop at " + format_time(time.time()))
+
 
     print ("# Start normalizing gram at " + format_time(time.time()))
     if normalize_gram_matrix:
@@ -79,3 +90,9 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, hashing, iterati
 
     print ("# Ending hgk sequential at " + format_time(time.time()))
     return gram_matrix,feature_vectors
+
+def compute_gram_parallel(args):
+    base_kernel, iterations, graph_db, colors_hashed, kernel_parameters = args
+    feature_vectors = base_kernel(graph_db, colors_hashed, *kernel_parameters)
+    feature_vectors = m.sqrt(1.0 / iterations) * (feature_vectors)
+    return feature_vectors.dot(feature_vectors.T)
