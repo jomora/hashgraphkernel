@@ -42,31 +42,35 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, hashing, iterati
     if scale_attributes:
         colors_0 = pre.scale(colors_0, axis=0)
 
-    print ("# Starting loop at " + format_time(time.time()))
-    for it in xrange(0, iterations):
-        colors_hashed = hashing(colors_0, dim_attributes, lsh_bin_width, sigma=sigma)
+    if not use_gram_matrices:
+        print ("# Starting loop at " + format_time(time.time()))
+        for it in xrange(0, iterations):
+            colors_hashed = hashing(colors_0, dim_attributes, lsh_bin_width, sigma=sigma)
 
-        tmp = base_kernel(graph_db, colors_hashed, *kernel_parameters)
-        if it == 0 and not use_gram_matrices:
-            feature_vectors = tmp
-        else:
-            if use_gram_matrices:
+            tmp = base_kernel(graph_db, colors_hashed, *kernel_parameters)
+            if it == 0:
                 feature_vectors = tmp
-                # feature_vectors = feature_vectors.tocsr()  
-                feature_vectors = m.sqrt(1.0 / iterations) * (feature_vectors)
-                gram_matrix += feature_vectors.dot(feature_vectors.T)
             else:
                 feature_vectors = sparse.hstack((feature_vectors, tmp))
 
-    feature_vectors = feature_vectors.tocsr()
-    print ("# Ending loop at " + format_time(time.time()))
+        feature_vectors = feature_vectors.tocsr()
+        print ("# Ending loop at " + format_time(time.time()))
 
-    if not use_gram_matrices:
         # Normalize feature vectors
         feature_vectors = m.sqrt(1.0 / iterations) * (feature_vectors)
         # Compute Gram matrix
         gram_matrix = feature_vectors.dot(feature_vectors.T)
         #gram_matrix = gram_matrix.toarray()
+    else: # if use_gram_matrices
+        print ("# Starting loop at " + format_time(time.time()))
+        for it in xrange(0, iterations):
+            colors_hashed = hashing(colors_0, dim_attributes, lsh_bin_width, sigma=sigma)
+            tmp = base_kernel(graph_db, colors_hashed, *kernel_parameters)
+            feature_vectors = tmp
+            feature_vectors = m.sqrt(1.0 / iterations) * (feature_vectors)
+            gram_matrix += feature_vectors.dot(feature_vectors.T)
+
+        print ("# Ending loop at " + format_time(time.time()))
 
     print ("# Start normalizing gram at " + format_time(time.time()))
     if normalize_gram_matrix:
