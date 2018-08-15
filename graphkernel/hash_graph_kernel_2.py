@@ -11,6 +11,8 @@ from auxiliarymethods import auxiliary_methods as aux
 from setuptools.dist import Feature
 from auxiliarymethods.logging import format_time, time_it
 import time
+from multiprocessing import Pool
+import os
 
 def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, hashing, iterations=20, lsh_bin_width=1.0, sigma=1.0,
                       normalize_gram_matrix=True, use_gram_matrices=False, scale_attributes=True):
@@ -65,21 +67,29 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, hashing, iterati
         print ("# Using gram matrix " + format_time(time.time()))
         print ("# Starting loop at " + format_time(time.time()))
 
-        # TASKS = [(base_kernel,graph_db, hashing(colors_0,
-        #                             dim_attributes,
-        #                             lsh_bin_width,
-        #                             sigma=sigma), kernel_parameters)
-        #                             for i in xrange(0,iterations)]
+        TASKS = [
+            (base_kernel,
+            iterations,
+            graph_db, hashing(
+                colors_0,
+                dim_attributes,
+                lsh_bin_width,
+                sigma=sigma),
+                kernel_parameters)
+        for i in xrange(0,iterations)]
 
-        # pool = Pool(processes=10)
-        # results = pool.map_async(run_base_kernel_parallel, TASKS,chunksize=1)
-        #
-        # pool.close()
-        # pool.join()
-        for it in xrange(0, iterations):
-            colors_hashed = hashing(colors_0, dim_attributes, lsh_bin_width, sigma=sigma)
-            gram_matrix += compute_gram_parallel((base_kernel, iterations, graph_db, colors_hashed, kernel_parameters))
-        feature_vectors = []    
+        pool = Pool(processes=4)
+        results = pool.map_async(compute_gram_parallel, TASKS,chunksize=1)
+
+        pool.close()
+        pool.join()
+        for i,res in enumerate(results.get()):
+            print("Getting result " + str(i))
+            gram_matrix += res
+        # for it in xrange(0, iterations):
+        #     colors_hashed = hashing(colors_0, dim_attributes, lsh_bin_width, sigma=sigma)
+        #     gram_matrix += compute_gram_parallel((base_kernel, iterations, graph_db, colors_hashed, kernel_parameters))
+        feature_vectors = []
         print ("# Ending loop at " + format_time(time.time()))
 
 
@@ -92,6 +102,7 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, hashing, iterati
     return gram_matrix,feature_vectors
 
 def compute_gram_parallel(args):
+    print "# Starting process ",os.getpid()," at ",format_time(time.time())
     base_kernel, iterations, graph_db, colors_hashed, kernel_parameters = args
     feature_vectors = base_kernel(graph_db, colors_hashed, *kernel_parameters)
     feature_vectors = m.sqrt(1.0 / iterations) * (feature_vectors)
