@@ -62,7 +62,7 @@ function graphbuilder_create_db(){
 	# Example call:
 	# sbt "run -in=../../data/examples/test -out=examples_out -ds=test"
 	echo "Running graphbuilder: create-db"
-	time $SBT_HOME/bin/sbt "run create-db -in="$SEML_DATA/$input_dir" -out=$output_dir -ds=$dataset"
+	time $SBT_HOME/bin/sbt "run create-db -in="$SEML_DATA/$input_dir" -out=$output_dir -ds=$dataset --samples=4000"
 }
 
 function graphbuilder_read_db(){
