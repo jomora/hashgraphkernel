@@ -4,16 +4,13 @@ from graphkernel import shortest_path_kernel_explicit as sp_exp
 from graphkernel import wl_kernel as wl
 from auxiliarymethods.dataset_parsers import DatasetParser
 from auxiliarymethods import auxiliary_methods as aux
-from auxiliarymethods.logging import format_time, time_it
-import time
+
 import graph_tool as gt
 import numpy as np
 import itertools
 import pprint
 
 def test_rbk_enzymes():
-    print ("# Start preparing hashes at " + format_time(time.time()))
-
     dataset = "ENYZMES"
     dp = DatasetParser("./datasets/")
     graph_db = dp.read_graph_db("ENZYMES")
@@ -34,8 +31,6 @@ def test_rbk_enzymes():
         graph_indices.append((offset, offset + g.num_vertices() - 1))
         offset += g.num_vertices()
 
-    print ("# End preparing hashes at " + format_time(time.time()))
-
     kernel_parameters_wl = [1, True, True, 0]
 
     kernel_iterations = 10
@@ -52,7 +47,7 @@ def test_rbk_enzymes():
     gram_matrix_1, feature_vectors_1 = rbk_parallel.hash_graph_kernel_parallel(graph_db, wl.weisfeiler_lehman_subtree_kernel,
         kernel_parameters_wl,  create_hash_function(hashes_1), kernel_iterations, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0,
         use_gram_matrices=True,normalize_gram_matrix=True)
-    gram_matrix_2, feature_vectors_2 = rbk_parallel.hash_graph_kernel_parallel(graph_db, wl.weisfeiler_lehman_subtree_kernel,
+    gram_matrix_2, feature_vectors_2 = rbk.hash_graph_kernel(graph_db, wl.weisfeiler_lehman_subtree_kernel,
         kernel_parameters_wl,  create_hash_function(hashes_2), kernel_iterations, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0,
         use_gram_matrices=True,normalize_gram_matrix=True)
 

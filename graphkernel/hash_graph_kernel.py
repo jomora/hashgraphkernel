@@ -9,10 +9,13 @@ from sklearn import preprocessing as pre
 
 from auxiliarymethods import auxiliary_methods as aux
 from setuptools.dist import Feature
-
+from auxiliarymethods.logging import format_time, time_it
+import time
 
 def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, hashing, iterations=20, lsh_bin_width=1.0, sigma=1.0,
                       normalize_gram_matrix=True, use_gram_matrices=False, scale_attributes=True):
+    print ("# Starting hgk sequential at " + format_time(time.time()))
+
     num_vertices = 0
     for g in graph_db:
         num_vertices += g.num_vertices()
@@ -32,13 +35,14 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, hashing, iterati
         for i, v in enumerate(g.vertices()):
             colors_0[i + offset] = g.vp.na[v]
 
-        graph_indices.append((offset, offset + g.num_vertices() - 1))
         offset += g.num_vertices()
+        graph_indices.append((offset, offset + g.num_vertices() - 1))
 
     # Normalize attributes: center to the mean and component wise scale to unit variance
     if scale_attributes:
         colors_0 = pre.scale(colors_0, axis=0)
 
+    print ("# Starting loop at " + format_time(time.time()))
     for it in xrange(0, iterations):
         colors_hashed = hashing(colors_0, dim_attributes, lsh_bin_width, sigma=sigma)
 
@@ -48,13 +52,14 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, hashing, iterati
         else:
             if use_gram_matrices:
                 feature_vectors = tmp
-                feature_vectors = feature_vectors.tocsr()
                 feature_vectors = m.sqrt(1.0 / iterations) * (feature_vectors)
                 gram_matrix += feature_vectors.dot(feature_vectors.T)
+                feature_vectors = feature_vectors.tocsr()
             else:
                 feature_vectors = sparse.hstack((feature_vectors, tmp))
 
     feature_vectors = feature_vectors.tocsr()
+    print ("# Ending loop at " + format_time(time.time()))
 
     if not use_gram_matrices:
         # Normalize feature vectors
@@ -63,6 +68,10 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, hashing, iterati
         gram_matrix = feature_vectors.dot(feature_vectors.T)
         #gram_matrix = gram_matrix.toarray()
 
+    print ("# Start normalizing gram at " + format_time(time.time()))
     if normalize_gram_matrix:
         gram_matrix = aux.normalize_gram_matrix(gram_matrix)
+    print ("# End normalizing gram at " + format_time(time.time()))
+
+    print ("# Ending hgk sequential at " + format_time(time.time()))
     return gram_matrix,feature_vectors
