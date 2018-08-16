@@ -12,9 +12,12 @@ from setuptools.dist import Feature
 from auxiliarymethods.logging import format_time, time_it
 import time
 
+DEBUG = False
+
 def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, hashing, iterations=20, lsh_bin_width=1.0, sigma=1.0,
                       normalize_gram_matrix=True, use_gram_matrices=False, scale_attributes=True):
-    print ("# Starting hgk sequential at " + format_time(time.time()))
+    start = time.time()
+    print ("\033[1;32m# Starting hgk sequential at " + format_time(start) + "\033[0;37m")
 
     num_vertices = 0
     for g in graph_db:
@@ -42,7 +45,10 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, hashing, iterati
     if scale_attributes:
         colors_0 = pre.scale(colors_0, axis=0)
 
-    print ("# Starting loop at " + format_time(time.time()))
+    loop_start = time.time()
+    if DEBUG:
+        print ("# Using gram matrix " + format_time(loop_start))
+        print ("# Starting loop at " + format_time(loop_start))
     for it in xrange(0, iterations):
         colors_hashed = hashing(colors_0, dim_attributes, lsh_bin_width, sigma=sigma)
 
@@ -52,15 +58,17 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, hashing, iterati
         else:
             if use_gram_matrices:
                 feature_vectors = tmp
-                # feature_vectors = feature_vectors.tocsr()  
+                # feature_vectors = feature_vectors.tocsr()
                 feature_vectors = m.sqrt(1.0 / iterations) * (feature_vectors)
                 gram_matrix += feature_vectors.dot(feature_vectors.T)
             else:
                 feature_vectors = sparse.hstack((feature_vectors, tmp))
 
     feature_vectors = feature_vectors.tocsr()
-    print ("# Ending loop at " + format_time(time.time()))
-
+    loop_end = time.time()
+    if DEBUG:
+        print ("# Ending loop at " + format_time(loop_end))
+    print ("\033[1;32m# Duration of loop in [s]: ") + str(loop_end - loop_start) + "\033[0;37m"
     if not use_gram_matrices:
         # Normalize feature vectors
         feature_vectors = m.sqrt(1.0 / iterations) * (feature_vectors)
@@ -68,10 +76,15 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, hashing, iterati
         gram_matrix = feature_vectors.dot(feature_vectors.T)
         #gram_matrix = gram_matrix.toarray()
 
-    print ("# Start normalizing gram at " + format_time(time.time()))
+    if DEBUG:
+        print ("# Start normalizing gram at " + format_time(time.time()))
     if normalize_gram_matrix:
         gram_matrix = aux.normalize_gram_matrix(gram_matrix)
-    print ("# End normalizing gram at " + format_time(time.time()))
+        if DEBUG:
+            print ("# End normalizing gram at " + format_time(time.time()))
 
-    print ("# Ending hgk sequential at " + format_time(time.time()))
+    end = time.time()
+    if DEBUG:
+        print ("# Ending hgk sequential at " + format_time(end))
+    print ("\033[1;32m# Duration of hgk sequential in [s]: ") + str(end - start) + "\033[0;37m"
     return gram_matrix,feature_vectors

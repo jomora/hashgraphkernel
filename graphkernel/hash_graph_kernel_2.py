@@ -13,10 +13,14 @@ from auxiliarymethods.logging import format_time, time_it
 import time
 from multiprocessing import Pool
 import os
+from scipy import sparse as spa
+
+DEBUG = False
 
 def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, hashing, iterations=20, lsh_bin_width=1.0, sigma=1.0,
                       normalize_gram_matrix=True, use_gram_matrices=False, scale_attributes=True):
-    print ("# Starting hgk sequential at " + format_time(time.time()))
+    start = time.time()
+    print ("\033[1;32m# Starting hgk parallel at " + format_time(start) + "\033[0;37m")
 
     num_vertices = 0
     for g in graph_db:
@@ -45,27 +49,48 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, hashing, iterati
         colors_0 = pre.scale(colors_0, axis=0)
 
     if not use_gram_matrices:
-        print ("# Starting loop at " + format_time(time.time()))
-        for it in xrange(0, iterations):
-            colors_hashed = hashing(colors_0, dim_attributes, lsh_bin_width, sigma=sigma)
+        loop_start = time.time()
+        if DEBUG:
+            print ("# Not using GRAM at " + format_time(loop_start))
+            print ("# Starting loop at " + format_time(loop_start)) 
+        TASKS = [
+            (base_kernel,
+            iterations,
+            graph_db, hashing(
+                colors_0,
+                dim_attributes,
+                lsh_bin_width,
+                sigma=sigma),
+                kernel_parameters)
+                for i in xrange(0,iterations)]
 
-            tmp = base_kernel(graph_db, colors_hashed, *kernel_parameters)
-            if it == 0:
-                feature_vectors = tmp
-            else:
-                feature_vectors = sparse.hstack((feature_vectors, tmp))
+        pool = Pool(processes=4)
+        results = pool.map_async(compute_feature_vectors_parallel, TASKS,chunksize=1)
 
-        feature_vectors = feature_vectors.tocsr()
-        print ("# Ending loop at " + format_time(time.time()))
+        pool.close()
+        pool.join()
+
+            # if it == 0:
+            #     feature_vectors = tmp
+            # else:
+            #     feature_vectors = sparse.hstack((feature_vectors, tmp))
+        results = np.asarray([r for r in results.get()])
+        feature_vectors = spa.hstack(results)
 
         # Normalize feature vectors
         feature_vectors = m.sqrt(1.0 / iterations) * (feature_vectors)
         # Compute Gram matrix
         gram_matrix = feature_vectors.dot(feature_vectors.T)
+        loop_end = time.time()
+        if DEBUG:
+            print ("# Ending loop at " + format_time(loop_end))
+        print ("\033[1;32m# Duration of loop in [s]: ") + str(loop_end - loop_start) + "\033[0;37m"
         #gram_matrix = gram_matrix.toarray()
     else: # if use_gram_matrices
-        print ("# Using gram matrix " + format_time(time.time()))
-        print ("# Starting loop at " + format_time(time.time()))
+        loop_start = time.time()
+        if DEBUG:
+            print ("# Using gram matrix " + format_time(loop_start))
+            print ("# Starting loop at " + format_time(loop_start))
 
         TASKS = [
             (base_kernel,
@@ -84,26 +109,44 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, hashing, iterati
         pool.close()
         pool.join()
         for i,res in enumerate(results.get()):
-            print("Getting result " + str(i))
+
+            if DEBUG:
+                print("Getting result " + str(i))
             gram_matrix += res
         # for it in xrange(0, iterations):
         #     colors_hashed = hashing(colors_0, dim_attributes, lsh_bin_width, sigma=sigma)
         #     gram_matrix += compute_gram_parallel((base_kernel, iterations, graph_db, colors_hashed, kernel_parameters))
         feature_vectors = []
-        print ("# Ending loop at " + format_time(time.time()))
+        loop_end = time.time()
+        if DEBUG:
+            print ("# Ending loop at " + format_time(loop_end))
+        print ("\033[1;32m# Duration of loop in [s]: ") + str(loop_end - loop_start) + "\033[0;37m"
 
 
-    print ("# Start normalizing gram at " + format_time(time.time()))
+    if DEBUG:
+        print ("# Start normalizing gram at " + format_time(time.time()))
     if normalize_gram_matrix:
         gram_matrix = aux.normalize_gram_matrix(gram_matrix)
-    print ("# End normalizing gram at " + format_time(time.time()))
+        if DEBUG:
+            print ("# End normalizing gram at " + format_time(time.time()))
 
-    print ("# Ending hgk sequential at " + format_time(time.time()))
+    end = time.time()
+    if DEBUG:
+        print ("# Ending hgk parallel at " + format_time(end))
+    print ("\033[1;32m# Duration of hgk parallel in [s]: ") + str(end - start) + "\033[0;37m"
+
     return gram_matrix,feature_vectors
 
 def compute_gram_parallel(args):
-    print "# Starting process ",os.getpid()," at ",format_time(time.time())
+    if DEBUG:
+        print "# Starting process ",os.getpid()," at ",format_time(time.time())
     base_kernel, iterations, graph_db, colors_hashed, kernel_parameters = args
     feature_vectors = base_kernel(graph_db, colors_hashed, *kernel_parameters)
     feature_vectors = m.sqrt(1.0 / iterations) * (feature_vectors)
     return feature_vectors.dot(feature_vectors.T)
+
+def compute_feature_vectors_parallel(args):
+    if DEBUG:
+        print "# Starting process ",os.getpid()," at ",format_time(time.time())
+    base_kernel, iterations, graph_db, colors_hashed, kernel_parameters = args
+    return spa.bsr_matrix(base_kernel(graph_db, colors_hashed, *kernel_parameters)).tocsr()

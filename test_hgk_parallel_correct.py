@@ -37,20 +37,64 @@ def test_rbk_enzymes():
     kernel_iterations = 10
     hashes = [aux.locally_sensitive_hashing(colors_0, dim_attributes, 1.0, sigma=1.0) for i in range(kernel_iterations)]
 
+    def create_hashes():
+        hashes = [aux.locally_sensitive_hashing(colors_0, dim_attributes, 1.0, sigma=1.0) for i in range(kernel_iterations)]
+        return iter(hashes),iter(hashes)
 
-    hashes_1 = iter(hashes)
-    hashes_2 = iter(hashes)
     def create_hash_function(hashes):
         def hashing(m, d, w, sigma=1.0):
             return hashes.next()
         return hashing
 
 
-    gram_matrix_1, feature_vectors_1 = rbk_2.hash_graph_kernel(graph_db, wl.weisfeiler_lehman_subtree_kernel,
+    print ("\033[1;32m# use_gram_matrices=True, normalize_gram_matrix=True: \033[0;37m")
+    hashes_1, hashes_2 = create_hashes()
+    gram_matrix_1, _ = rbk_2.hash_graph_kernel(graph_db, wl.weisfeiler_lehman_subtree_kernel,
         kernel_parameters_wl, create_hash_function(hashes_2 ), kernel_iterations, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0,
         use_gram_matrices=True,normalize_gram_matrix=True)
-    gram_matrix_2, feature_vectors_2 = rbk.hash_graph_kernel(graph_db, wl.weisfeiler_lehman_subtree_kernel,
+    gram_matrix_2, _ = rbk.hash_graph_kernel(graph_db, wl.weisfeiler_lehman_subtree_kernel,
         kernel_parameters_wl,create_hash_function(hashes_1), kernel_iterations, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0,
         use_gram_matrices=True,normalize_gram_matrix=True)
 
     assert np.sum(gram_matrix_1 - gram_matrix_2) == 0.0
+    del gram_matrix_1
+    del gram_matrix_2
+
+    print ("\033[1;32m# use_gram_matrices=True, normalize_gram_matrix=True: \033[0;37m")
+    hashes_1, hashes_2 = create_hashes()
+    gram_matrix_1, _ = rbk_2.hash_graph_kernel(graph_db, wl.weisfeiler_lehman_subtree_kernel,
+        kernel_parameters_wl, create_hash_function(hashes_2 ), kernel_iterations, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0,
+        use_gram_matrices=True,normalize_gram_matrix=False)
+    gram_matrix_2, _ = rbk.hash_graph_kernel(graph_db, wl.weisfeiler_lehman_subtree_kernel,
+        kernel_parameters_wl,create_hash_function(hashes_1), kernel_iterations, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0,
+        use_gram_matrices=True,normalize_gram_matrix=False)
+
+    assert np.sum(gram_matrix_1 - gram_matrix_2) == 0.0
+    del gram_matrix_1
+    del gram_matrix_2
+
+    print ("\033[1;32m# use_gram_matrices=False, normalize_gram_matrix=True: \033[0;37m")
+    hashes_1, hashes_2 = create_hashes()
+    gram_matrix_1, _ = rbk_2.hash_graph_kernel(graph_db, wl.weisfeiler_lehman_subtree_kernel,
+        kernel_parameters_wl, create_hash_function(hashes_2 ), kernel_iterations, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0,
+        use_gram_matrices=False,normalize_gram_matrix=True)
+    gram_matrix_2, _ = rbk.hash_graph_kernel(graph_db, wl.weisfeiler_lehman_subtree_kernel,
+        kernel_parameters_wl,create_hash_function(hashes_1), kernel_iterations, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0,
+        use_gram_matrices=False,normalize_gram_matrix=True)
+
+    assert np.sum(gram_matrix_1 - gram_matrix_2) == 0.0
+    del gram_matrix_1
+    del gram_matrix_2
+
+    print ("\033[1;32m# use_gram_matrices=False, normalize_gram_matrix=False: \033[0;37m")
+    hashes_1, hashes_2 = create_hashes()
+    gram_matrix_1, _ = rbk_2.hash_graph_kernel(graph_db, wl.weisfeiler_lehman_subtree_kernel,
+        kernel_parameters_wl, create_hash_function(hashes_2 ), kernel_iterations, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0,
+        use_gram_matrices=False,normalize_gram_matrix=False)
+    gram_matrix_2, _ = rbk.hash_graph_kernel(graph_db, wl.weisfeiler_lehman_subtree_kernel,
+        kernel_parameters_wl,create_hash_function(hashes_1), kernel_iterations, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0,
+        use_gram_matrices=False,normalize_gram_matrix=False)
+
+    assert np.sum(gram_matrix_1 - gram_matrix_2) == 0.0
+    del gram_matrix_1
+    del gram_matrix_2
