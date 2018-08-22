@@ -86,5 +86,5 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, hashing, iterati
     end = time.time()
     if DEBUG:
         print ("# Ending hgk sequential at " + format_time(end))
-    print ("\033[1;32m# Duration of hgk sequential in [s]: ") + str(end - start) + "\033[0;37m"
+    print ("\033[1;32m# Duration of hgk sequential in [s]: " + str(end - start) + "\033[0;37m")
     return gram_matrix,feature_vectors
