@@ -49,7 +49,7 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, hashing, iterati
     if DEBUG:
         print ("# Using gram matrix " + format_time(loop_start))
         print ("# Starting loop at " + format_time(loop_start))
-    for it in xrange(0, iterations):
+    for it in range(0, iterations):
         colors_hashed = hashing(colors_0, dim_attributes, lsh_bin_width, sigma=sigma)
 
         tmp = base_kernel(graph_db, colors_hashed, *kernel_parameters)
