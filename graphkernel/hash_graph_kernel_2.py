@@ -63,7 +63,7 @@ def hash_graph_kernel(LOG, graph_db, base_kernel, kernel_parameters, hashing, it
                 lsh_bin_width,
                 sigma=sigma),
                 kernel_parameters)
-                for i in xrange(0,iterations)]
+                for i in range(0,iterations)]
 
         pool = Pool(processes=4)
         results = pool.map_async(compute_feature_vectors_parallel, TASKS,chunksize=1)
@@ -101,7 +101,7 @@ def hash_graph_kernel(LOG, graph_db, base_kernel, kernel_parameters, hashing, it
                 lsh_bin_width,
                 sigma=sigma),
                 kernel_parameters)
-        for i in xrange(0,iterations)]
+        for i in range(0,iterations)]
 
         pool = Pool(processes=4)
         results = pool.map_async(compute_gram_parallel, TASKS,chunksize=1)
