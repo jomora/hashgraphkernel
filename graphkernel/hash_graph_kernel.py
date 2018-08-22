@@ -68,7 +68,7 @@ def hash_graph_kernel(graph_db, base_kernel, kernel_parameters, hashing, iterati
     loop_end = time.time()
     if DEBUG:
         print ("# Ending loop at " + format_time(loop_end))
-    print ("\033[1;32m# Duration of loop in [s]: ") + str(loop_end - loop_start) + "\033[0;37m"
+    print ("\033[1;32m# Duration of loop in [s]: " + str(loop_end - loop_start) + "\033[0;37m")
     if not use_gram_matrices:
         # Normalize feature vectors
         feature_vectors = m.sqrt(1.0 / iterations) * (feature_vectors)
