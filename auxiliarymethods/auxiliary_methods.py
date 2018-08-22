@@ -6,12 +6,12 @@ import math as m
 import numpy as np
 import scipy.sparse as sps
 import itertools
-    
+
 def normalize_gram_matrix(gram_matrix):
     n = gram_matrix.shape[0]
     gram_matrix_norm = sps.lil_matrix((n,n),dtype=np.float64) #np.zeros([n, n], dtype=np.float64)
-    for i in xrange(0, n):
-        for j in xrange(i, n):
+    for i in range(0, n):
+        for j in range(i, n):
             if not (gram_matrix[i,i] == 0.0 or gram_matrix[j,j] == 0.0):
                 g = gram_matrix[i,j] / m.sqrt(gram_matrix[i,i] * gram_matrix[j,j])
                 gram_matrix_norm[i,j] = g
