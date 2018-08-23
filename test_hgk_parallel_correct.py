@@ -13,6 +13,7 @@ import logging
 
 
 def test_parallel_vs_sequential():
+
     # dataset = "qualitas-corpus"
     # dir = "/home/jomora/seml/data/parallel-test/"
     dataset = "ENZYMES"
@@ -22,6 +23,7 @@ def test_parallel_vs_sequential():
     fh = logging.FileHandler(dir + dataset + "/output.log")
     fh.setFormatter(logging.Formatter("[%(asctime)s] [%(levelname)s] %(message)s"))
     LOG.addHandler(fh)
+    LOG.info("\033[1;32m############### STARTING TEST ############### \033[0;37m")
 
     dp = DatasetParser(dir)
     graph_db = dp.read_graph_db(dataset)
