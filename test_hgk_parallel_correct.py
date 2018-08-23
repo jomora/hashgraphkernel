@@ -24,7 +24,6 @@ def test_parallel_vs_sequential():
     LOG.addHandler(fh)
 
     dp = DatasetParser(dir)
-    LOG.debug("")
     graph_db = dp.read_graph_db(dataset)
     # colors_0 = np.zeros((np.sum([len(list(g.vertices())) for g in graph_db]),),dtype=np.int64)
     num_vertices = 0
@@ -58,12 +57,12 @@ def test_parallel_vs_sequential():
         return hashing
 
 
-    print ("\033[1;32m# use_gram_matrices=True, normalize_gram_matrix=True: \033[0;37m")
+    LOG.info("\033[1;32m# use_gram_matrices=True, normalize_gram_matrix=True: \033[0;37m")
     hashes_1, hashes_2 = create_hashes()
     gram_matrix_1, _ = rbk_2.hash_graph_kernel(LOG,graph_db, wl.weisfeiler_lehman_subtree_kernel,
         kernel_parameters_wl, create_hash_function(hashes_2 ), kernel_iterations, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0,
         use_gram_matrices=True,normalize_gram_matrix=True)
-    gram_matrix_2, _ = rbk.hash_graph_kernel(graph_db, wl.weisfeiler_lehman_subtree_kernel,
+    gram_matrix_2, _ = rbk.hash_graph_kernel(LOG, graph_db, wl.weisfeiler_lehman_subtree_kernel,
         kernel_parameters_wl,create_hash_function(hashes_1), kernel_iterations, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0,
         use_gram_matrices=True,normalize_gram_matrix=True)
 
@@ -71,12 +70,12 @@ def test_parallel_vs_sequential():
     del gram_matrix_1
     del gram_matrix_2
 
-    print ("\033[1;32m# use_gram_matrices=True, normalize_gram_matrix=True: \033[0;37m")
+    LOG.info("\033[1;32m# use_gram_matrices=True, normalize_gram_matrix=True: \033[0;37m")
     hashes_1, hashes_2 = create_hashes()
     gram_matrix_1, _ = rbk_2.hash_graph_kernel(LOG,graph_db, wl.weisfeiler_lehman_subtree_kernel,
         kernel_parameters_wl, create_hash_function(hashes_2 ), kernel_iterations, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0,
         use_gram_matrices=True,normalize_gram_matrix=False)
-    gram_matrix_2, _ = rbk.hash_graph_kernel(graph_db, wl.weisfeiler_lehman_subtree_kernel,
+    gram_matrix_2, _ = rbk.hash_graph_kernel(LOG, graph_db, wl.weisfeiler_lehman_subtree_kernel,
         kernel_parameters_wl,create_hash_function(hashes_1), kernel_iterations, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0,
         use_gram_matrices=True,normalize_gram_matrix=False)
 
@@ -84,12 +83,12 @@ def test_parallel_vs_sequential():
     del gram_matrix_1
     del gram_matrix_2
 
-    print ("\033[1;32m# use_gram_matrices=False, normalize_gram_matrix=True: \033[0;37m")
+    LOG.info("\033[1;32m# use_gram_matrices=False, normalize_gram_matrix=True: \033[0;37m")
     hashes_1, hashes_2 = create_hashes()
     gram_matrix_1, _ = rbk_2.hash_graph_kernel(LOG,graph_db, wl.weisfeiler_lehman_subtree_kernel,
         kernel_parameters_wl, create_hash_function(hashes_2 ), kernel_iterations, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0,
         use_gram_matrices=False,normalize_gram_matrix=True)
-    gram_matrix_2, _ = rbk.hash_graph_kernel(graph_db, wl.weisfeiler_lehman_subtree_kernel,
+    gram_matrix_2, _ = rbk.hash_graph_kernel(LOG, graph_db, wl.weisfeiler_lehman_subtree_kernel,
         kernel_parameters_wl,create_hash_function(hashes_1), kernel_iterations, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0,
         use_gram_matrices=False,normalize_gram_matrix=True)
 
@@ -97,12 +96,12 @@ def test_parallel_vs_sequential():
     del gram_matrix_1
     del gram_matrix_2
 
-    print ("\033[1;32m# use_gram_matrices=False, normalize_gram_matrix=False: \033[0;37m")
+    LOG.info("\033[1;32m# use_gram_matrices=False, normalize_gram_matrix=False: \033[0;37m")
     hashes_1, hashes_2 = create_hashes()
     gram_matrix_1, _ = rbk_2.hash_graph_kernel(LOG,graph_db, wl.weisfeiler_lehman_subtree_kernel,
         kernel_parameters_wl, create_hash_function(hashes_2 ), kernel_iterations, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0,
         use_gram_matrices=False,normalize_gram_matrix=False)
-    gram_matrix_2, _ = rbk.hash_graph_kernel(graph_db, wl.weisfeiler_lehman_subtree_kernel,
+    gram_matrix_2, _ = rbk.hash_graph_kernel(LOG, graph_db, wl.weisfeiler_lehman_subtree_kernel,
         kernel_parameters_wl,create_hash_function(hashes_1), kernel_iterations, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0,
         use_gram_matrices=False,normalize_gram_matrix=False)
 
