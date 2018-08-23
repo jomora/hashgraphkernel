@@ -48,6 +48,8 @@ def hash_graph_kernel(LOG, graph_db, base_kernel, kernel_parameters, hashing, it
     # Normalize attributes: center to the mean and component wise scale to unit variance
     if scale_attributes:
         colors_0 = pre.scale(colors_0, axis=0)
+    pool = Pool()
+    LOG.info("\033[1;32m# Using " + str(pool._processes) + " processes\033[0;37m")
 
     if not use_gram_matrices:
         loop_start = time.time()
@@ -65,7 +67,6 @@ def hash_graph_kernel(LOG, graph_db, base_kernel, kernel_parameters, hashing, it
                 kernel_parameters)
                 for i in range(0,iterations)]
 
-        pool = Pool(processes=4)
         results = pool.map_async(compute_feature_vectors_parallel, TASKS,chunksize=1)
 
         pool.close()
@@ -103,7 +104,6 @@ def hash_graph_kernel(LOG, graph_db, base_kernel, kernel_parameters, hashing, it
                 kernel_parameters)
         for i in range(0,iterations)]
 
-        pool = Pool(processes=4)
         results = pool.map_async(compute_gram_parallel, TASKS,chunksize=1)
 
         pool.close()
