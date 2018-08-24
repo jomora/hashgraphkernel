@@ -54,6 +54,7 @@ function read_principal_components(){
 ### ### #### ### ###
 
 function graphbuilder_create_db(){
+	local samples="$1"
 	cd "$SEML_CODE/graphbuilder/"
 	# Run ram.sh to set JAVA_OPTS environment variable
 
@@ -61,8 +62,8 @@ function graphbuilder_create_db(){
 
 	# Example call:
 	# sbt "run -in=../../data/examples/test -out=examples_out -ds=test"
-	echo "Running graphbuilder: create-db"
-	time $SBT_HOME/bin/sbt "run create-db -in="$SEML_DATA/$input_dir" -out=$output_dir -ds=$dataset --samples=4000"
+	echo "Running graphbuilder: create-db with ${samples} samples"
+	time $SBT_HOME/bin/sbt "run create-db -in="$SEML_DATA/$input_dir" -out=$output_dir -ds=$dataset --samples=${samples}"
 }
 
 function graphbuilder_read_db(){
@@ -158,6 +159,7 @@ function project_clustering() {
 input_dir=$1
 output_dir=$2
 dataset=$3
+samples=$4
 SERVER_ENV="./server-env.cfg"
 LAPTOP_ENV="./laptop-env.cfg"
 if  [ -f "$SERVER_ENV" ] && [ -f "$LAPTOP_ENV" ]; then
@@ -205,7 +207,7 @@ echo "[9] all of the above"
 read selection
 case $selection in
 	[1]*)
-		graphbuilder_create_db
+		graphbuilder_create_db ${samples:-5000}
 		;;
 	[2]*)
 		graphbuilder_read_db
