@@ -10,15 +10,16 @@ import numpy as np
 import itertools
 import pprint
 import logging
-
+import os
 
 def test_parallel_vs_sequential():
 
     # dataset = "qualitas-corpus"
     # dir = "/home/jomora/seml/data/parallel-test/"
-    dataset = "ENZYMES"
-    dir = "datasets/"
-
+    # dataset = "ENZYMES"
+    # dir = "datasets/"
+    dataset = os.environ['dataset']
+    dir = "/home/jomora/seml/data/example/"
     LOG = logging.Logger(name=__file__,level=logging.INFO)
     fh = logging.FileHandler(dir + dataset + "/output.log")
     fh.setFormatter(logging.Formatter("[%(asctime)s] [%(levelname)s] %(message)s"))
