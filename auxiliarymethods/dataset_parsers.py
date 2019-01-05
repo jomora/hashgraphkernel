@@ -9,6 +9,7 @@ import os
 import scipy.sparse as sps
 import csv
 
+import itertools
 
 class DatasetParser:
     def __init__(self, path):
@@ -20,35 +21,38 @@ class DatasetParser:
 
     def read_graph_db(self,ds_name):
         pre = ""
-
+        print("# Creating...")
+        print("# \t- graph_indicator")
         with open(self.PATH + pre + ds_name + "/" + ds_name + "_graph_indicator.txt", "r") as f:
             graph_indicator = [int(i) - 1 for i in list(f)]
         f.closed
-
+        xrange = lambda stop: iter(itertools.count().next, stop)
         # Nodes
         num_graphs = max(graph_indicator)
         node_indices = []
         offset = []
         c = 0
-
-        for i in range(num_graphs + 1):
+        print("# \t- node_indices")
+        for i in xrange(num_graphs + 1):
             offset.append(c)
             c_i = graph_indicator.count(i)
             node_indices.append((c, c + c_i - 1))
             c += c_i
 
+        print("# \t- graph_db")
         graph_db = []
         vertex_list = []
         for i in node_indices:
             g = gt.Graph(directed=False)
             vertex_list_g = []
-            for _ in range(i[1] - i[0] + 1):
+            for _ in xrange(i[1] - i[0] + 1):
                 vertex_list_g.append(g.add_vertex())
 
             graph_db.append(g)
             vertex_list.append(vertex_list_g)
 
         # Edges
+        print("# \t- edges")
         with open(self.PATH + pre + ds_name + "/" + ds_name + "_A.txt", "r") as f:
             edges = [i.split(',') for i in list(f)]
         f.closed
@@ -66,9 +70,9 @@ class DatasetParser:
             # Avoid multigraph
             if not g.edge(e[0] - off, e[1] - off):
                 edge_list.append(g.add_edge(e[0] - off, e[1] - off))
-
         # Node labels
         if path.exists(self.PATH + pre + ds_name + "/" + ds_name + "_node_labels.txt"):
+            print("# \t- node_labels")
             with open(self.PATH + pre + ds_name + "/" + ds_name + "_node_labels.txt", "r") as f:
                 node_labels = [int(i) for i in list(f)]
             f.closed
@@ -83,6 +87,7 @@ class DatasetParser:
 
         # Node Attributes
         if path.exists(self.PATH + pre + ds_name + "/" + ds_name + "_node_attributes.txt"):
+            print("# \t- node_attributes")
             with open(self.PATH + pre + ds_name + "/" + ds_name + "_node_attributes.txt", "r") as f:
                 node_attributes = [map(float, i.split(',')) for i in list(f)]
             f.closed
@@ -97,12 +102,13 @@ class DatasetParser:
 
         # Edge Labels
         if path.exists(self.PATH + ds_name + "/" + ds_name + "_edge_labels.txt"):
+            print("# \t- edge_labels")
             with open(self.PATH + ds_name + "/" + ds_name + "_edge_labels.txt", "r") as f:
                 edge_labels = [int(i) for i in list(f)]
             f.closed
 
             l_el = []
-            for i in range(num_graphs + 1):
+            for i in xrange(num_graphs + 1):
                 g = graph_db[graph_indicator[i]]
                 l_el.append(g.new_edge_property("int"))
 
@@ -115,12 +121,13 @@ class DatasetParser:
 
         # Edge Attributes
         if path.exists(self.PATH + ds_name + "/" + ds_name + "_edge_attributes.txt"):
+            print("# \t- edge_attributes")
             with open(self.PATH + ds_name + "/" + ds_name + "_edge_attributes.txt", "r") as f:
                 edge_attributes = [map(float, i.split(',')) for i in list(f)]
             f.closed
 
             l_ea = []
-            for i in range(num_graphs + 1):
+            for i in xrange(num_graphs + 1):
                 g = graph_db[graph_indicator[i]]
                 l_ea.append(g.new_edge_property("vector<float>"))
 
@@ -172,9 +179,9 @@ class DatasetParser:
         with open(self.PATH + ds_name + "/" + ds_name + "_feature_vectors", 'w') as f:
             dense = feature_vectors.todense()
             shape = dense.shape
-            for i in range(shape[0]):
+            for i in xrange(shape[0]):
                 s = "" if classes == [] else str(classes[i]) + " "
-                for j in range(shape[1]):
+                for j in xrange(shape[1]):
                     s += str(dense[i, j])
                     s += " "
                     

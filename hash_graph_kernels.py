@@ -46,6 +46,9 @@ def main():
     dataset = args.dataset
     PATH = args.base
     parallel = args.parallel
+    print("# Dataset: " + dataset)
+    print("# Base directory: " + PATH)
+    print("# Running in parallel mode: " + str(parallel))
     start = time.time()
     print ("# Program started at " + format_time(start))
     #dataset = "all"
