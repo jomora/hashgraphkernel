@@ -11,6 +11,8 @@ import time
 import os
 from auxiliarymethods import auxiliary_methods as aux
 from setuptools.dist import Feature
+import multiprocessing
+from multiprocessing import Process,Queue,Pool
 
 def run_base_kernel_parallel(tup):
     print "# Starting process ",os.getpid()," at ",format_time(time.time())
@@ -59,10 +61,10 @@ def hash_graph_kernel_parallel(graph_db, base_kernel, kernel_parameters, hashing
     #             for it in xrange(0, iterations)]
 
 
-
-    from multiprocessing import Process,Queue,Pool
     queues_and_processes = []
-    pool = Pool(processes=10)
+    cores = multiprocessing.cpu_count()
+    print("# Running parallel with %d cores" % cores)
+    pool = Pool(processes=cores)
 
 
     TASKS = [(base_kernel,(graph_db, hashing(colors_0,

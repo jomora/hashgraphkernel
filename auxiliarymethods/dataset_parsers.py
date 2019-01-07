@@ -34,6 +34,8 @@ class DatasetParser:
         c = 0
         print("# \t- node_indices")
         for i in xrange(num_graphs + 1):
+            if i % 1000 == 0:
+                print("#\t\t- iteration %d of %d" % (i,num_graphs + 1))
             offset.append(c)
             c_i = graph_indicator.count(i)
             node_indices.append((c, c + c_i - 1))
