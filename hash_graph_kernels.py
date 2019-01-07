@@ -13,9 +13,10 @@ import time
 import datetime
 from auxiliarymethods.logging import format_time, time_it
 from graphkernel import hash_graph_kernel_parallel as rbk_parallel
-
+import logging
 
 import argparse
+import scipy.sparse as sps
 
 
 
@@ -94,12 +95,13 @@ def main():
 
     # Compute gram matrix for HGK-SP
     # 20 is the number of iterations
+    LOG = logging
     if parallel:
         gram_matrix, feature_vectors = time_it(rbk_parallel.hash_graph_kernel_parallel,graph_db, wl.weisfeiler_lehman_subtree_kernel,
-            kernel_parameters_wl, 10, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0, use_gram_matrices=True,normalize_gram_matrix=False)
+            kernel_parameters_wl, aux.locally_sensitive_hashing, iterations=10, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0, use_gram_matrices=True,normalize_gram_matrix=False)
     else:
-        gram_matrix, feature_vectors = time_it(rbk.hash_graph_kernel,graph_db, wl.weisfeiler_lehman_subtree_kernel,
-            kernel_parameters_wl, 10, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0, use_gram_matrices=True,normalize_gram_matrix=False)
+        gram_matrix, feature_vectors = time_it(rbk.hash_graph_kernel,LOG, graph_db, wl.weisfeiler_lehman_subtree_kernel,
+            kernel_parameters_wl, aux.locally_sensitive_hashing, iterations=10, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0, use_gram_matrices=True,normalize_gram_matrix=False)
     # Normalize gram matrix
     gram_matrix = time_it(aux.normalize_gram_matrix,gram_matrix)
 
@@ -113,7 +115,6 @@ def main():
     # Write out simple Gram matrix in sparse format
 
     print("Gram matrix in NPZ format")
-    import scipy.sparse as sps
     time_it(dp.write_sparse_gram_matrix,gram_matrix.tocoo(),dataset)
     print("Shape of Gram Matrix: " + str(np.shape(gram_matrix)))
 
