@@ -63,8 +63,9 @@ def hash_graph_kernel_parallel(graph_db, base_kernel, kernel_parameters, hashing
 
     queues_and_processes = []
     cores = multiprocessing.cpu_count()
-    print("# Running parallel with %d cores" % cores)
-    pool = Pool(processes=cores)
+    numProcesses = min(cores,10)
+    print("# Running parallel with %d cores" % numProcesses)
+    pool = Pool(processes=numProcesses)
 
 
     TASKS = [(base_kernel,(graph_db, hashing(colors_0,
