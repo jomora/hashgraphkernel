@@ -8,6 +8,7 @@ from auxiliarymethods.dataset_parsers import DatasetParser
 from graphkernel import hash_graph_kernel as rbk
 from graphkernel import shortest_path_kernel_explicit as sp_exp
 from graphkernel import wl_kernel as wl
+from graphkernel import wl_kernel_sparse as wl_sparse
 import numpy as np
 import time
 import datetime
@@ -97,10 +98,10 @@ def main():
     # 20 is the number of iterations
     LOG = logging
     if parallel:
-        gram_matrix, feature_vectors = time_it(rbk_parallel.hash_graph_kernel_parallel,graph_db, wl.weisfeiler_lehman_subtree_kernel,
+        gram_matrix, feature_vectors = time_it(rbk_parallel.hash_graph_kernel_parallel,graph_db, wl_sparse.weisfeiler_lehman_subtree_kernel,
             kernel_parameters_wl, aux.locally_sensitive_hashing, iterations=10, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0, use_gram_matrices=True,normalize_gram_matrix=False)
     else:
-        gram_matrix, feature_vectors = time_it(rbk.hash_graph_kernel,LOG, graph_db, wl.weisfeiler_lehman_subtree_kernel,
+        gram_matrix, feature_vectors = time_it(rbk.hash_graph_kernel,LOG, graph_db, wl_sparse.weisfeiler_lehman_subtree_kernel,
             kernel_parameters_wl, aux.locally_sensitive_hashing, iterations=10, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0, use_gram_matrices=True,normalize_gram_matrix=False)
     # Normalize gram matrix
     gram_matrix = time_it(aux.normalize_gram_matrix,gram_matrix)
