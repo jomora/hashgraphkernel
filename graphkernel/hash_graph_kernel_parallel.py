@@ -13,6 +13,7 @@ from auxiliarymethods import auxiliary_methods as aux
 from setuptools.dist import Feature
 import multiprocessing
 from multiprocessing import Process,Queue,Pool
+import sys
 
 def run_base_kernel_parallel(tup):
     print "# Starting process ",os.getpid()," at ",format_time(time.time())
@@ -35,10 +36,10 @@ def hash_graph_kernel_parallel(graph_db, base_kernel, kernel_parameters, hashing
     g = graph_db[0]
     v = list(graph_db[0].vertices())[0]
     dim_attributes = len(g.vp.na[v])
-    colors_0 = np.zeros([num_vertices, dim_attributes])
+    colors_0 = np.zeros([num_vertices, dim_attributes],dtype=np.float32)
     offset = 0
 
-    gram_matrix = sparse.lil_matrix((n,n),dtype=np.float64).tocsr() #np.zeros([n, n])
+    gram_matrix = sparse.lil_matrix((n,n),dtype=np.float32).tocsr()
 
     # Get attributes from all graph instances
     graph_indices = []
@@ -78,6 +79,7 @@ def hash_graph_kernel_parallel(graph_db, base_kernel, kernel_parameters, hashing
 
     pool.close()
     pool.join()
+
     print ("# Joining pool at " + format_time(time.time()))
     # results.sort(key=lambda tup: tup[0])
     # results = [tup[1] for tup in results]
@@ -111,7 +113,6 @@ def hash_graph_kernel_parallel(graph_db, base_kernel, kernel_parameters, hashing
         # Compute Gram matrix
         gram_matrix = feature_vectors.dot(feature_vectors.T)
         #gram_matrix = gram_matrix.toarray()
-    from auxiliarymethods.logging import time_it
     print ("# Start normalizing gram at " + format_time(time.time()))
     if normalize_gram_matrix:
         gram_matrix = time_it(aux.normalize_gram_matrix,gram_matrix)
