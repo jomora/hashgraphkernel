@@ -116,13 +116,13 @@ def main(dataset,basepath,parallel,compute_feature_vectors):
 
 
 def read_args():
-    parser = argparse.ArgumentParser(description='Run the  Hash Graph Kernel')
+    parser = argparse.ArgumentParser(description='Run multiple Hash Graph Kernels')
     parser.add_argument('-ds','--dataset', action="store", dest="dataset",
         help="The name of the dataset (must match the directory" \
             " name in which the datset is stored, and the prefix" \
             " of all files in the dataset directors.")
     parser.add_argument('-b', '--base',action="store", dest="base",
-        help="The base directory in which the datset directory is located")
+        help="The projet directory which contains multiple datasets name as sample_i")
     parser.add_argument('-p','--parallel', action="store_true",dest='parallel', default=False)
     parser.add_argument('-V', '--feature-vectors',action="store_true", dest="feature_vectors",
         help="If present then feature vectors will be stored.")
@@ -145,4 +145,44 @@ def read_args():
 
 if __name__ == "__main__":
     dataset,basepath,parallel,compute_feature_vectors = read_args()
-    main(dataset,basepath,parallel,compute_feature_vectors)
+    cwd = os.path.dirname(os.path.realpath(__file__))
+    os.chdir(basepath)
+    basedirs = []
+    for f in os.listdir('.'):
+        if os.path.isdir(f):
+            basedirs.append(os.path.realpath(f) + "/")
+    os.chdir(cwd)
+    print("# Analyse the following datasets:")
+    for d in basedirs:
+        print(d)
+    print("# Start graph kernels:")
+
+    def apply_parallel(tup):
+        f,args = tup
+        f(*args)
+
+    tasks = []
+    def run():
+        # if not parallel:
+        #     for base in basedirs:
+        #         print("# Run HGK on directory: %s" % base+dataset)
+        #         main(dataset,base,parallel,compute_feature_vectors)
+        # else:
+        for base in basedirs:
+            print("# Prepare HGKs for parallel execution: %s" % base+dataset)
+            tasks.append((main,(dataset,base,parallel,compute_feature_vectors)))
+        cores = multiprocessing.cpu_count()
+        numProcesses = min(cores,10)
+        pool = Pool(processes=numProcesses)
+        print ("# Starting pool at " + format_time(time.time()))
+        results = pool.map_async(apply_parallel,tasks,chunksize=1)
+        pool.close()
+        pool.join()
+        results = results.get()
+    time_it(run)
+    # print ("# Joining pool at " + format_time(time.time()))
+    # results.sort(key=lambda tup: tup[0])
+    # results = [tup[1] for tup in results]
+    # results = results.get()
+
+    # main(dataset,basepath,parallel,compute_feature_vectors)
