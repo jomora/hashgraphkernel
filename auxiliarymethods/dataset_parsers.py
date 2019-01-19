@@ -194,6 +194,9 @@ class DatasetParser:
     def write_sparse_gram_matrix(self,gram_matrix,ds_name):
         sps.save_npz(self.PATH + ds_name + "/" + ds_name + '_sparse_gram.npz',gram_matrix.tocoo())
 
+    def write_sparse_feature_vectors(self,feature_vectors,ds_name):
+        sps.save_npz(self.PATH + ds_name + "/" + ds_name + '_sparse_feature_vectors.npz',feature_vectors.tocoo())
+
     def read_sparse_gram(self,prefix):
         return sps.load_npz(prefix + "_sparse_gram.npz")
 
