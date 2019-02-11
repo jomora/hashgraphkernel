@@ -163,22 +163,21 @@ if __name__ == "__main__":
 
     tasks = []
     def run():
-        # if not parallel:
-        #     for base in basedirs:
-        #         print("# Run HGK on directory: %s" % base+dataset)
-        #         main(dataset,base,parallel,compute_feature_vectors)
-        # else:
         for base in basedirs:
-            print("# Prepare HGKs for parallel execution: %s" % base+dataset)
-            tasks.append((main,(dataset,base,parallel,compute_feature_vectors)))
-        cores = multiprocessing.cpu_count()
-        numProcesses = min(cores,10)
-        pool = Pool(processes=numProcesses)
-        print ("# Starting pool at " + format_time(time.time()))
-        results = pool.map_async(apply_parallel,tasks,chunksize=1)
-        pool.close()
-        pool.join()
-        results = results.get()
+            print("# Run HGK on directory: %s" % base+dataset)
+            main(dataset,base,parallel,compute_feature_vectors)
+        # else:
+        # for base in basedirs:
+        #     print("# Prepare HGKs for parallel execution: %s" % base+dataset)
+        #     tasks.append((main,(dataset,base,parallel,compute_feature_vectors)))
+        # cores = multiprocessing.cpu_count()
+        # numProcesses = min(cores,10)
+        # pool = Pool(processes=numProcesses)
+        # print ("# Starting pool at " + format_time(time.time()))
+        # results = pool.map_async(apply_parallel,tasks,chunksize=1)
+        # pool.close()
+        # pool.join()
+        # results = results.get()
     time_it(run)
     # print ("# Joining pool at " + format_time(time.time()))
     # results.sort(key=lambda tup: tup[0])

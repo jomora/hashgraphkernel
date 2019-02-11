@@ -1,7 +1,9 @@
 from graphkernel import hash_graph_kernel as rbk
 from graphkernel import hash_graph_kernel_2 as rbk_2
 from graphkernel import shortest_path_kernel_explicit as sp_exp
-from graphkernel import wl_kernel as wl
+# from graphkernel import wl_kernel as wl
+from graphkernel import wl_kernel_sparse as wl
+
 from auxiliarymethods.dataset_parsers import DatasetParser
 from auxiliarymethods import auxiliary_methods as aux
 
@@ -16,10 +18,10 @@ def test_parallel_vs_sequential():
 
     # dataset = "qualitas-corpus"
     # dir = "/home/jomora/seml/data/parallel-test/"
-    # dataset = "ENZYMES"
-    # dir = "datasets/"
-    dataset = os.environ['dataset']
-    dir = "/home/jomora/seml/data/example/"
+    dataset = "ENZYMES"
+    dir = "datasets/"
+    # dataset = os.environ['dataset']
+    # dir = "/home/jomora/seml/data/example/"
     LOG = logging.Logger(name=__file__,level=logging.INFO)
     fh = logging.FileHandler(dir + dataset + "/output.log")
     fh.setFormatter(logging.Formatter("[%(asctime)s] [%(levelname)s] %(message)s"))
@@ -108,6 +110,9 @@ def test_parallel_vs_sequential():
         kernel_parameters_wl,create_hash_function(hashes_1), kernel_iterations, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0,
         use_gram_matrices=False,normalize_gram_matrix=False)
 
-    assert np.sum(gram_matrix_1 - gram_matrix_2) == 0.0
+    assert np.sum(gram_matrix_1 - gram_matrix_2) == 0.1
     del gram_matrix_1
     del gram_matrix_2
+
+if __name__ == "__main__":
+    test_parallel_vs_sequential()
