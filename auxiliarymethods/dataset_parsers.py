@@ -10,6 +10,9 @@ import scipy.sparse as sps
 import csv
 
 import itertools
+import datetime
+
+def logNow(): return "[" + datetime.datetime.now().replace(microsecond=0).isoformat() + "]"
 
 class DatasetParser:
     def __init__(self, path):
@@ -21,8 +24,8 @@ class DatasetParser:
 
     def read_graph_db(self,ds_name):
         pre = ""
-        print("# Creating...")
-        print("# \t- graph_indicator")
+        print(logNow() + " [HGK] # Creating...")
+        print(logNow() + " [HGK] # \t- graph_indicator")
         with open(self.PATH + pre + ds_name + "/" + ds_name + "_graph_indicator.txt", "r") as f:
             graph_indicator = [int(i) - 1 for i in list(f)]
         f.closed
@@ -32,16 +35,16 @@ class DatasetParser:
         node_indices = []
         offset = []
         c = 0
-        print("# \t- node_indices")
+        print(logNow() + " [HGK] # \t- node_indices")
         for i in xrange(num_graphs + 1):
             if i % 1000 == 0:
-                print("#\t\t- iteration %d of %d" % (i,num_graphs + 1))
+                print(logNow() + " [HGK] #\t\t- iteration %d of %d" % (i,num_graphs + 1))
             offset.append(c)
             c_i = graph_indicator.count(i)
             node_indices.append((c, c + c_i - 1))
             c += c_i
 
-        print("# \t- graph_db")
+        print(logNow() + " [HGK] # \t- graph_db")
         graph_db = []
         vertex_list = []
         for i in node_indices:
@@ -54,7 +57,7 @@ class DatasetParser:
             vertex_list.append(vertex_list_g)
 
         # Edges
-        print("# \t- edges")
+        print(logNow() + " [HGK] # \t- edges")
         with open(self.PATH + pre + ds_name + "/" + ds_name + "_A.txt", "r") as f:
             edges = [i.split(',') for i in list(f)]
         f.closed
@@ -74,7 +77,7 @@ class DatasetParser:
                 edge_list.append(g.add_edge(e[0] - off, e[1] - off))
         # Node labels
         if path.exists(self.PATH + pre + ds_name + "/" + ds_name + "_node_labels.txt"):
-            print("# \t- node_labels")
+            print(logNow() + " [HGK] # \t- node_labels")
             with open(self.PATH + pre + ds_name + "/" + ds_name + "_node_labels.txt", "r") as f:
                 node_labels = [int(i) for i in list(f)]
             f.closed
@@ -89,7 +92,7 @@ class DatasetParser:
 
         # Node Attributes
         if path.exists(self.PATH + pre + ds_name + "/" + ds_name + "_node_attributes.txt"):
-            print("# \t- node_attributes")
+            print(logNow() + " [HGK] # \t- node_attributes")
             with open(self.PATH + pre + ds_name + "/" + ds_name + "_node_attributes.txt", "r") as f:
                 node_attributes = [map(float, i.split(',')) for i in list(f)]
             f.closed
@@ -104,7 +107,7 @@ class DatasetParser:
 
         # Edge Labels
         if path.exists(self.PATH + ds_name + "/" + ds_name + "_edge_labels.txt"):
-            print("# \t- edge_labels")
+            print(logNow() + " [HGK] # \t- edge_labels")
             with open(self.PATH + ds_name + "/" + ds_name + "_edge_labels.txt", "r") as f:
                 edge_labels = [int(i) for i in list(f)]
             f.closed
@@ -123,7 +126,7 @@ class DatasetParser:
 
         # Edge Attributes
         if path.exists(self.PATH + ds_name + "/" + ds_name + "_edge_attributes.txt"):
-            print("# \t- edge_attributes")
+            print(logNow() + " [HGK] # \t- edge_attributes")
             with open(self.PATH + ds_name + "/" + ds_name + "_edge_attributes.txt", "r") as f:
                 edge_attributes = [map(float, i.split(',')) for i in list(f)]
             f.closed
@@ -201,7 +204,6 @@ class DatasetParser:
         return sps.load_npz(prefix + "_sparse_gram.npz")
 
     def read_graph_labels(self,prefix):
-        print(prefix)
         graph_labels = []
         with open(prefix + '_graph_labels.txt','r') as f:
             for label in list(f):

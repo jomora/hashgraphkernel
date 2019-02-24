@@ -25,15 +25,16 @@ from multiprocessing import Process,Queue,Pool
 import sys
 import os
 
+def logNow(): return "[" + datetime.datetime.now().replace(microsecond=0).isoformat() + "]"
 
 def main(dataset,basepath,parallel,compute_feature_vectors):
 
 
-    print("# Dataset: " + dataset)
-    print("# Base directory: " + basepath)
-    print("# Running in parallel mode: " + str(parallel))
+    print(logNow() + " [HGK] # Dataset: " + dataset)
+    print(logNow() + " [HGK] # Base directory: " + basepath)
+    print(logNow() + " [HGK] # Running in parallel mode: " + str(parallel))
     start = time.time()
-    print ("# Program started at " + format_time(start))
+    print(logNow() + " [HGK] # Program started at " + format_time(start))
     #dataset = "all"
     #dataset = "ENZYMES"
     # PATH = os.environ['SEML_DATA'] + '/output/'
@@ -41,7 +42,7 @@ def main(dataset,basepath,parallel,compute_feature_vectors):
 
     dp = DatasetParser(basepath)
 
-    print ("# Processing dataset: " + dataset)
+    print(logNow() + " [HGK] # Processing dataset: " + dataset)
     # Load ENZYMES data set
     # graph_db, classes = time_it(dp.read_txt,(dataset))
     graph_db = time_it(dp.read_graph_db,dataset)
@@ -85,7 +86,7 @@ def main(dataset,basepath,parallel,compute_feature_vectors):
         gram_matrix, feature_vectors = time_it(rbk.hash_graph_kernel,LOG, graph_db, wl_sparse.weisfeiler_lehman_subtree_kernel,
             kernel_parameters_wl, aux.locally_sensitive_hashing, iterations=10, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0, use_gram_matrices=True,normalize_gram_matrix=False)
     
-    print ("Shape of feature vectors: " + str(feature_vectors.shape))
+    print(logNow() + " [HGK] Shape of feature vectors: " + str(feature_vectors.shape))
 
     # Write out LIBSVM matrix
     #dp.write_lib_svm(gram_matrix, classes, "gram_matrix")
@@ -94,25 +95,25 @@ def main(dataset,basepath,parallel,compute_feature_vectors):
     # time_it(dp.write_gram_matrix,gram_matrix, dataset)
     # Write out simple Gram matrix in sparse format
 
-    print("Gram matrix in NPZ format")
+    print(logNow() + " [HGK] Gram matrix in NPZ format")
     time_it(dp.write_sparse_gram_matrix,gram_matrix.tocoo(),dataset)
-    print("Shape of Gram Matrix: " + str(np.shape(gram_matrix)))
+    print(logNow() + " [HGK] Shape of Gram Matrix: " + str(np.shape(gram_matrix)))
 
-    print("Feature vectors in NPZ format")
+    print(logNow() + " [HGK] Feature vectors in NPZ format")
     time_it(dp.write_sparse_feature_vectors,sps.csr_matrix(feature_vectors),dataset)
-    print("Shape of Gram Matrix: " + str(np.shape(gram_matrix)))
+    print(logNow() + " [HGK] Shape of Gram Matrix: " + str(np.shape(gram_matrix)))
 
-    print("Feature vectors in NPZ format")
+    print(logNow() + " [HGK] Feature vectors in NPZ format")
     time_it(dp.write_sparse_feature_vectors,sps.csr_matrix(feature_vectors),dataset)
-    print("Shape of feature vectors: " + str(np.shape(feature_vectors)))
+    print(logNow() + " [HGK] Shape of feature vectors: " + str(np.shape(feature_vectors)))
 
     time_it(dp.write_gram_matrix,gram_matrix.todense(),dataset)
     time_it(dp.write_feature_vectors,feature_vectors,dataset)
 
     #dp.write_feature_vectors(feature_vectors, dataset, [])
     end = time.time()
-    print ("# Program ended at ") + format_time(start)
-    print ("# Duration in [s]: ") + str(end - start)
+    print(logNow() + " [HGK] # Program ended at ") + format_time(start)
+    print(logNow() + " [HGK] # Duration in [s]: ") + str(end - start)
 
 
 def read_args():
@@ -129,13 +130,13 @@ def read_args():
     args = parser.parse_args()
     problem = False
     if args.dataset == None:
-        print("# No dataset given")
+        print(logNow() + " [HGK] # No dataset given")
         problem = True
     if args.base == None:
-        print("# No base directory given")
+        print(logNow() + " [HGK] # No base directory given")
         problem = True
     if problem:
-        print("--> Argument error: exiting")
+        print(logNow() + " [HGK] --> Argument error: exiting")
         exit(0)
     dataset = args.dataset
     basepath = args.base
@@ -152,10 +153,10 @@ if __name__ == "__main__":
         if os.path.isdir(f):
             basedirs.append(os.path.realpath(f) + "/")
     os.chdir(cwd)
-    print("# Analyse the following datasets:")
+    print(logNow() + " [HGK] # Analyse the following datasets:")
     for d in basedirs:
         print(d)
-    print("# Start graph kernels:")
+    print(logNow() + " [HGK] # Start graph kernels:")
 
     def apply_parallel(tup):
         f,args = tup
@@ -164,18 +165,18 @@ if __name__ == "__main__":
     tasks = []
     def run():
         for base in basedirs:
-            print("# Run HGK on directory: %s" % base+dataset)
+            print(logNow() + " [HGK] # Run HGK on directory: %s" % base+dataset)
             main(dataset,base,parallel,compute_feature_vectors)
         # else:
         # for base in basedirs:
-        #     print("# Prepare HGKs for parallel execution: %s" % base+dataset)
+        #     print(logNow() + " [HGK] # Prepare HGKs for parallel execution: %s" % base+dataset)
         #     tasks.append((main,(dataset,base,parallel,compute_feature_vectors)))
         # cores = multiprocessing.cpu_count()
         # numProcesses = min(cores,10)
         # pool = Pool(processes=numProcesses)
         # print ("# Starting pool at " + format_time(time.time()))
         # results = pool.map_async(apply_parallel,tasks,chunksize=1)
-        # pool.close()
+        # pool.close()  
         # pool.join()
         # results = results.get()
     time_it(run)
