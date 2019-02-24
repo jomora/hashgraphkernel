@@ -18,6 +18,7 @@ import logging
 
 import argparse
 import scipy.sparse as sps
+import scipy 
 
 import multiprocessing
 from multiprocessing import Process,Queue,Pool
@@ -27,7 +28,7 @@ import os
 
 def logNow(): return "[" + datetime.datetime.now().replace(microsecond=0).isoformat() + "]"
 
-def main(dataset,basepath,parallel,compute_feature_vectors):
+def main(dataset,basepath,parallel,sp,compute_feature_vectors):
 
 
     print(logNow() + " [HGK] # Dataset: " + dataset)
@@ -78,12 +79,17 @@ def main(dataset,basepath,parallel,compute_feature_vectors):
 
     # Compute gram matrix for HGK-SP
     # 20 is the number of iterations
+    base_kernel = sp_exp.shortest_path_kernel if sp else wl_sparse.weisfeiler_lehman_subtree_kernel
+    kernel_name = "SP" if sp else "WL"
+    print(logNow() + " [HGK] Using " + ("SP Kernel" if sp else "WL Kernel"))
+    print(logNow() + " [HGK] Running " + ("in parallel" if parallel else "sequentially"))
+
     LOG = logging
     if parallel:
-        gram_matrix, feature_vectors = time_it(rbk_parallel.hash_graph_kernel_parallel,graph_db, wl_sparse.weisfeiler_lehman_subtree_kernel,
+        gram_matrix, feature_vectors = time_it(rbk_parallel.hash_graph_kernel_parallel,graph_db, base_kernel,
             kernel_parameters_wl, aux.locally_sensitive_hashing, iterations=10, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0, use_gram_matrices=True,normalize_gram_matrix=False)
     else:
-        gram_matrix, feature_vectors = time_it(rbk.hash_graph_kernel,LOG, graph_db, wl_sparse.weisfeiler_lehman_subtree_kernel,
+        gram_matrix, feature_vectors = time_it(rbk.hash_graph_kernel,LOG, graph_db, base_kernel,
             kernel_parameters_wl, aux.locally_sensitive_hashing, iterations=10, scale_attributes=True, lsh_bin_width=1.0, sigma=1.0, use_gram_matrices=True,normalize_gram_matrix=False)
     
     print(logNow() + " [HGK] Shape of feature vectors: " + str(feature_vectors.shape))
@@ -95,20 +101,17 @@ def main(dataset,basepath,parallel,compute_feature_vectors):
     # time_it(dp.write_gram_matrix,gram_matrix, dataset)
     # Write out simple Gram matrix in sparse format
 
+    
     print(logNow() + " [HGK] Gram matrix in NPZ format")
-    time_it(dp.write_sparse_gram_matrix,gram_matrix.tocoo(),dataset)
+    time_it(dp.write_sparse_gram_matrix,gram_matrix.tocoo() if scipy.sparse.issparse(gram_matrix) else sps.csr_matrix(gram_matrix),dataset,kernel_name)
     print(logNow() + " [HGK] Shape of Gram Matrix: " + str(np.shape(gram_matrix)))
 
     print(logNow() + " [HGK] Feature vectors in NPZ format")
-    time_it(dp.write_sparse_feature_vectors,sps.csr_matrix(feature_vectors),dataset)
-    print(logNow() + " [HGK] Shape of Gram Matrix: " + str(np.shape(gram_matrix)))
+    time_it(dp.write_sparse_feature_vectors,feature_vectors.tocoo() if scipy.sparse.issparse(feature_vectors) else sps.csr_matrix(feature_vectors),dataset,kernel_name)
+    print(logNow() + " [HGK] Shape of Feature Vectors: " + str(np.shape(feature_vectors)))
 
-    print(logNow() + " [HGK] Feature vectors in NPZ format")
-    time_it(dp.write_sparse_feature_vectors,sps.csr_matrix(feature_vectors),dataset)
-    print(logNow() + " [HGK] Shape of feature vectors: " + str(np.shape(feature_vectors)))
-
-    time_it(dp.write_gram_matrix,gram_matrix.todense(),dataset)
-    time_it(dp.write_feature_vectors,feature_vectors,dataset)
+    time_it(dp.write_gram_matrix,gram_matrix.todense() if scipy.sparse.issparse(gram_matrix) else gram_matrix,dataset,kernel_name)
+    time_it(dp.write_feature_vectors,feature_vectors.todense() if scipy.sparse.issparse(feature_vectors) else feature_vectors,dataset,kernel_name)
 
     #dp.write_feature_vectors(feature_vectors, dataset, [])
     end = time.time()
@@ -124,6 +127,7 @@ def read_args():
             " of all files in the dataset directors.")
     parser.add_argument('-b', '--base',action="store", dest="base",
         help="The projet directory which contains multiple datasets name as sample_i")
+    parser.add_argument('--sp', action="store_true",dest='sp', default=False)
     parser.add_argument('-p','--parallel', action="store_true",dest='parallel', default=False)
     parser.add_argument('-V', '--feature-vectors',action="store_true", dest="feature_vectors",
         help="If present then feature vectors will be stored.")
@@ -141,11 +145,12 @@ def read_args():
     dataset = args.dataset
     basepath = args.base
     parallel = args.parallel
+    sp = args.sp
     compute_feature_vectors = args.feature_vectors
-    return dataset,basepath,parallel,compute_feature_vectors
+    return dataset,basepath,parallel,sp,compute_feature_vectors
 
 if __name__ == "__main__":
-    dataset,basepath,parallel,compute_feature_vectors = read_args()
+    dataset,basepath,parallel,sp,compute_feature_vectors = read_args()
     cwd = os.path.dirname(os.path.realpath(__file__))
     os.chdir(basepath)
     basedirs = []
@@ -166,7 +171,7 @@ if __name__ == "__main__":
     def run():
         for base in basedirs:
             print(logNow() + " [HGK] # Run HGK on directory: %s" % base+dataset)
-            main(dataset,base,parallel,compute_feature_vectors)
+            main(dataset,base,parallel,sp,compute_feature_vectors)
         # else:
         # for base in basedirs:
         #     print(logNow() + " [HGK] # Prepare HGKs for parallel execution: %s" % base+dataset)

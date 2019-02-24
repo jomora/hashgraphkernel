@@ -5,6 +5,7 @@
 import math as m
 import numpy as np
 import scipy.sparse as sparse
+import scipy
 from sklearn import preprocessing as pre
 from auxiliarymethods.logging import format_time, time_it
 import time
@@ -96,13 +97,13 @@ def hash_graph_kernel_parallel(graph_db, base_kernel, kernel_parameters, hashing
         else:
             if use_gram_matrices:
                 feature_vectors = tmp
-                feature_vectors = feature_vectors.tocsr()
+                feature_vectors = feature_vectors.tocsr() if scipy.sparse.issparse(feature_vectors) else feature_vectors
                 feature_vectors = m.sqrt(1.0 / iterations) * (feature_vectors)
                 gram_matrix += feature_vectors.dot(feature_vectors.T) #.toarray()
             else:
                 feature_vectors = sparse.hstack((feature_vectors, tmp))
 
-    feature_vectors = feature_vectors.tocsr()
+    feature_vectors = feature_vectors.tocsr() if scipy.sparse.issparse(feature_vectors) else feature_vectors
     print(logNow() + " [HGK] [WL-PAR] # Finishing loop at " + format_time(time.time()))
 
     if not use_gram_matrices:

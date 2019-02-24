@@ -81,7 +81,7 @@ def shortest_path_kernel(graph_db, hashed_attributes, *kwargs):
         feature_vectors.append(np.bincount(colors[index[0]:index[1] + 1], minlength=m))
 
     if not compute_gram_matrix:
-        return lil.lil_matrix(feature_vectors, dtype=np.float64)
+        return sp.sparse.vstack(feature_vectors) # lil.lil_matrix(feature_vectors, dtype=np.float64)
     else:
         # Make feature vectors sparse
         gram_matrix = csr.csr_matrix(feature_vectors, dtype=np.float64)

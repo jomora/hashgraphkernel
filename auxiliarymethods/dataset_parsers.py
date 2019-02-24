@@ -169,8 +169,8 @@ class DatasetParser:
                 k += 1
         f.closed
 
-    def write_gram_matrix(self,gram_matrix, ds_name):
-        with open(self.PATH + ds_name + "/" + ds_name + "_gram_matrix_simple", 'w') as f:
+    def write_gram_matrix(self,gram_matrix, ds_name,kernel_name):
+        with open(self.PATH + ds_name + "/" + ds_name + "_gram_matrix_simple_" + kernel_name, 'w') as f:
             for row in gram_matrix:
                 s = ""
                 for r in row:
@@ -179,10 +179,10 @@ class DatasetParser:
                 f.write(s)
         f.closed
 
-    def write_feature_vectors(self,feature_vectors, ds_name, classes=[]):
+    def write_feature_vectors(self,feature_vectors, ds_name, kernel_name, classes=[]):
         
-        with open(self.PATH + ds_name + "/" + ds_name + "_feature_vectors", 'w') as f:
-            dense = feature_vectors.todense()
+        with open(self.PATH + ds_name + "/" + ds_name + "_feature_vectors_" + kernel_name, 'w') as f:
+            dense = feature_vectors
             shape = dense.shape
             for i in xrange(shape[0]):
                 s = "" if classes == [] else str(classes[i]) + " "
@@ -194,11 +194,11 @@ class DatasetParser:
     #         f.write(feature_vectors.todense())
         f.closed
 
-    def write_sparse_gram_matrix(self,gram_matrix,ds_name):
-        sps.save_npz(self.PATH + ds_name + "/" + ds_name + '_sparse_gram.npz',gram_matrix.tocoo())
+    def write_sparse_gram_matrix(self, gram_matrix, ds_name, kernel_name):
+        sps.save_npz(self.PATH + ds_name + "/" + ds_name + '_sparse_gram_' + kernel_name + '.npz',gram_matrix.tocoo())
 
-    def write_sparse_feature_vectors(self,feature_vectors,ds_name):
-        sps.save_npz(self.PATH + ds_name + "/" + ds_name + '_sparse_feature_vectors.npz',feature_vectors.tocoo())
+    def write_sparse_feature_vectors(self, feature_vectors, ds_name, kernel_name):
+        sps.save_npz(self.PATH + ds_name + "/" + ds_name + '_sparse_feature_vectors_' + kernel_name + '.npz',feature_vectors.tocoo())
 
     def read_sparse_gram(self,prefix):
         return sps.load_npz(prefix + "_sparse_gram.npz")

@@ -11,13 +11,17 @@ from auxiliarymethods import auxiliary_methods as aux
 from setuptools.dist import Feature
 from auxiliarymethods.logging import format_time, time_it
 import time
-
+import scipy
+import datetime
 DEBUG = False
+
+def logNow(): return "[" + datetime.datetime.now().replace(microsecond=0).isoformat() + "]"
+
 
 def hash_graph_kernel(LOG, graph_db, base_kernel, kernel_parameters, hashing, iterations=20, lsh_bin_width=1.0, sigma=1.0,
                       normalize_gram_matrix=True, use_gram_matrices=False, scale_attributes=True):
     start = time.time()
-    LOG.info("\033[1;32m# Starting hgk sequential at " + format_time(start) + "\033[0;37m")
+    LOG.info(logNow() + " [HGK] \033[1;32m# Starting hgk sequential at " + format_time(start) + "\033[0;37m")
 
     num_vertices = 0
     for g in graph_db:
@@ -46,8 +50,8 @@ def hash_graph_kernel(LOG, graph_db, base_kernel, kernel_parameters, hashing, it
         colors_0 = pre.scale(colors_0, axis=0)
 
     loop_start = time.time()
-    LOG.debug ("# Using gram matrix " + format_time(loop_start))
-    LOG.debug ("# Starting loop at " + format_time(loop_start))
+    LOG.debug(logNow() + " [HGK] # Using gram matrix " + format_time(loop_start))
+    LOG.debug(logNow() + " [HGK] # Starting loop at " + format_time(loop_start))
     for it in range(0, iterations):
         colors_hashed = hashing(colors_0, dim_attributes, lsh_bin_width, sigma=sigma)
 
@@ -63,10 +67,11 @@ def hash_graph_kernel(LOG, graph_db, base_kernel, kernel_parameters, hashing, it
             else:
                 feature_vectors = sparse.hstack((feature_vectors, tmp))
 
-    feature_vectors = feature_vectors.tocsr()
+    if scipy.sparse.issparse(feature_vectors):
+        feature_vectors = feature_vectors.tocsr()
     loop_end = time.time()
-    LOG.debug("# Ending loop at " + format_time(loop_end))
-    LOG.info("\033[1;32m# Duration of loop in [s]: " + str(loop_end - loop_start) + "\033[0;37m")
+    LOG.debug(logNow() + " [HGK] # Ending loop at " + format_time(loop_end))
+    LOG.info(logNow() + " [HGK] \033[1;32m# Duration of loop in [s]: " + str(loop_end - loop_start) + "\033[0;37m")
     if not use_gram_matrices:
         # Normalize feature vectors
         feature_vectors = m.sqrt(1.0 / iterations) * (feature_vectors)
@@ -74,12 +79,12 @@ def hash_graph_kernel(LOG, graph_db, base_kernel, kernel_parameters, hashing, it
         gram_matrix = feature_vectors.dot(feature_vectors.T)
         #gram_matrix = gram_matrix.toarray()
 
-    LOG.debug("# Start normalizing gram at " + format_time(time.time()))
+    LOG.debug(logNow() + " [HGK] # Start normalizing gram at " + format_time(time.time()))
     if normalize_gram_matrix:
         gram_matrix = aux.normalize_gram_matrix(gram_matrix)
-        LOG.debug("# End normalizing gram at " + format_time(time.time()))
+        LOG.debug(logNow() + " [HGK] # End normalizing gram at " + format_time(time.time()))
 
     end = time.time()
-    LOG.debug("# Ending hgk sequential at " + format_time(end))
-    LOG.info("\033[1;32m# Duration of hgk sequential in [s]: " + str(end - start) + "\033[0;37m")
+    LOG.debug(logNow() + " [HGK] # Ending hgk sequential at " + format_time(end))
+    LOG.info(logNow() + " [HGK] \033[1;32m# Duration of hgk sequential in [s]: " + str(end - start) + "\033[0;37m")
     return gram_matrix,feature_vectors
