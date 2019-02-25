@@ -31,10 +31,10 @@ def hash_graph_kernel(LOG, graph_db, base_kernel, kernel_parameters, hashing, it
     g = graph_db[0]
     v = list(graph_db[0].vertices())[0]
     dim_attributes = len(g.vp.na[v])
-    colors_0 = np.zeros([num_vertices, dim_attributes],dtype=np.float32)
+    colors_0 = np.zeros([num_vertices, dim_attributes],dtype=np.float64)
     offset = 0
 
-    gram_matrix = sparse.lil_matrix((n,n),dtype=np.float32).tocsr() #np.zeros([n, n])
+    gram_matrix = sparse.lil_matrix((n,n),dtype=np.float64).tocsr() #np.zeros([n, n])
 
     # Get attributes from all graph instances
     graph_indices = []

@@ -21,20 +21,20 @@ def weisfeiler_lehman_subtree_kernel(graph_db, hashed_attributes, *kwargs):
     # Create one empty feature vector for each graph
     feature_vectors = []
     for _ in graph_db:
-        feature_vectors.append(np.zeros(0, dtype=np.float32))
+        feature_vectors.append(np.zeros(0, dtype=np.float64))
 
     # Construct block diagonal matrix of all adjacency matrices
     adjacency_matrices = []
     for g in graph_db:
         adjacency_matrices.append(gt.adjacency(g))
-    M = sp.sparse.block_diag(tuple(adjacency_matrices), dtype=np.float32, format="csr")
+    M = sp.sparse.block_diag(tuple(adjacency_matrices), dtype=np.float64, format="csr")
     num_vertices = M.shape[0]
 
     # Load list of precalculated logarithms of prime numbers
     log_primes = log_pl.log_primes[0:num_vertices]
 
     # Color vector representing labels
-    colors_0 = np.zeros(num_vertices, dtype=np.float32)
+    colors_0 = np.zeros(num_vertices, dtype=np.float64)
     # Color vector representing hashed attributes
     colors_1 = hashed_attributes
 
@@ -61,7 +61,7 @@ def weisfeiler_lehman_subtree_kernel(graph_db, hashed_attributes, *kwargs):
 
         if use_labels:
             # Map colors into a single color vector
-            colors_all = np.array([colors_0, colors_1],dtype=np.float32)
+            colors_all = np.array([colors_0, colors_1],dtype=np.float64)
             colors_all = [hash(tuple(row)) for row in colors_all.T]
             _, colors_all = np.unique(colors_all, return_inverse=True)
             max_all = int(np.amax(colors_all) + 1)
@@ -87,10 +87,10 @@ def weisfeiler_lehman_subtree_kernel(graph_db, hashed_attributes, *kwargs):
                 colors_1 = compute_coloring(M, colors_1, log_primes[0:len(colors_1)])
 
     if not compute_gram_matrix:
-        return lil.lil_matrix(feature_vectors, dtype=np.float32)
+        return lil.lil_matrix(feature_vectors, dtype=np.float64)
     else:
         # Make feature vectors sparse
-        gram_matrix = csr.csr_matrix(feature_vectors, dtype=np.float32)
+        gram_matrix = csr.csr_matrix(feature_vectors, dtype=np.float64)
         # Compute gram matrix
         gram_matrix = gram_matrix.dot(gram_matrix.T)
 
@@ -103,7 +103,7 @@ def weisfeiler_lehman_subtree_kernel(graph_db, hashed_attributes, *kwargs):
 
 
 def compute_coloring(M, colors, log_primes):
-    log_prime_colors = np.array([log_primes[i] for i in colors], dtype=np.float32)
+    log_prime_colors = np.array([log_primes[i] for i in colors], dtype=np.float64)
     colors = colors + M.dot(log_prime_colors)
 
     # Round numbers to avoid numerical problems

@@ -81,7 +81,7 @@ def main(dataset,basepath,parallel,sp,compute_feature_vectors):
     # Compute gram matrix for HGK-SP
     # 20 is the number of iterations
     base_kernel = sp_exp.shortest_path_kernel if sp else wl_sparse.weisfeiler_lehman_subtree_kernel
-    kernel_name = "SP" if sp else "WL"
+    kernel_name = "sp" if sp else "wl"
     print(logNow() + " [HGK] Using " + ("SP Kernel" if sp else "WL Kernel"))
     print(logNow() + " [HGK] Running " + ("in parallel" if parallel else "sequentially"))
 
