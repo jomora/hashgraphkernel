@@ -17,8 +17,8 @@ from graphkernel import hash_graph_kernel_parallel as rbk_parallel
 import logging
 
 import argparse
-import scipy.sparse as sps
 import scipy 
+import scipy.sparse as sps
 
 import multiprocessing
 from multiprocessing import Process,Queue,Pool
@@ -26,7 +26,8 @@ from multiprocessing import Process,Queue,Pool
 import sys
 import os
 
-def logNow(): return "[" + datetime.datetime.now().replace(microsecond=0).isoformat() + "]"
+def logNow(): 
+    return "[" + datetime.datetime.now().replace(microsecond=0).isoformat() + "]"
 
 def main(dataset,basepath,parallel,sp,compute_feature_vectors):
 
@@ -110,8 +111,8 @@ def main(dataset,basepath,parallel,sp,compute_feature_vectors):
     time_it(dp.write_sparse_feature_vectors,feature_vectors.tocoo() if scipy.sparse.issparse(feature_vectors) else sps.csr_matrix(feature_vectors),dataset,kernel_name)
     print(logNow() + " [HGK] Shape of Feature Vectors: " + str(np.shape(feature_vectors)))
 
-    time_it(dp.write_gram_matrix,gram_matrix.todense() if scipy.sparse.issparse(gram_matrix) else gram_matrix,dataset,kernel_name)
-    time_it(dp.write_feature_vectors,feature_vectors.todense() if scipy.sparse.issparse(feature_vectors) else feature_vectors,dataset,kernel_name)
+    # time_it(dp.write_gram_matrix,gram_matrix.todense() if scipy.sparse.issparse(gram_matrix) else gram_matrix,dataset,kernel_name)
+    # time_it(dp.write_feature_vectors,feature_vectors.todense() if scipy.sparse.issparse(feature_vectors) else feature_vectors,dataset,kernel_name)
 
     #dp.write_feature_vectors(feature_vectors, dataset, [])
     end = time.time()
@@ -127,7 +128,7 @@ def read_args():
             " of all files in the dataset directors.")
     parser.add_argument('-b', '--base',action="store", dest="base",
         help="The projet directory which contains multiple datasets name as sample_i")
-    parser.add_argument('--sp', action="store_true",dest='sp', default=False)
+    parser.add_argument('-sp','--shop', action="store_true",dest='sp', default=False)
     parser.add_argument('-p','--parallel', action="store_true",dest='parallel', default=False)
     parser.add_argument('-V', '--feature-vectors',action="store_true", dest="feature_vectors",
         help="If present then feature vectors will be stored.")
