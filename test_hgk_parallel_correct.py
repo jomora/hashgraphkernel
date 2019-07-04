@@ -115,4 +115,8 @@ def test_parallel_vs_sequential():
     del gram_matrix_2
 
 if __name__ == "__main__":
+<<<<<<< Updated upstream
     test_parallel_vs_sequential()
+=======
+  test_parallel_vs_sequential()
+>>>>>>> Stashed changes
